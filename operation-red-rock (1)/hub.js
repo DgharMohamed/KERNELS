@@ -44,6 +44,7 @@ const state = {
   visible: true,
   pauseVisible: false,
   introPlaying: false,
+  introWaitingForKey: false,
   introDoneCallback: null,
   screen: 'loading',
   progress: 0,
@@ -327,14 +328,21 @@ function playIntroVideo(onComplete) {
 
   hideHub();
   state.introPlaying = true;
+  state.introWaitingForKey = false;
   state.introDoneCallback = typeof onComplete === 'function' ? onComplete : null;
+
+  if (dom.introControls) {
+    dom.introControls.hidden = false;
+  }
 
   video.src = INTRO_VIDEO_SRC;
   video.currentTime = 0;
   video.muted = !state.settings.music && !state.settings.sfx;
   updateIntroMuteButton();
   overlay.hidden = false;
-  if (dom.introSkipBtn) dom.introSkipBtn.focus();
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
 
   const playPromise = video.play();
   if (playPromise && typeof playPromise.catch === 'function') {
@@ -350,10 +358,25 @@ function playIntroVideo(onComplete) {
   }
 }
 
+function handleIntroEnded() {
+  if (!state.introPlaying || state.introWaitingForKey) return;
+  state.introWaitingForKey = true;
+  if (dom.introVideo) {
+    dom.introVideo.pause();
+  }
+  if (dom.introControls) {
+    dom.introControls.hidden = true;
+  }
+}
+
 function finishIntroVideo() {
   if (!state.introPlaying) return;
   state.introPlaying = false;
+  state.introWaitingForKey = false;
 
+  if (dom.introControls) {
+    dom.introControls.hidden = false;
+  }
   if (dom.introVideo) {
     dom.introVideo.pause();
     dom.introVideo.removeAttribute('src');
@@ -475,10 +498,14 @@ function handleGlobalKeydown(event) {
   triggerAudioUnlock();
 
   if (state.introPlaying) {
-    if (event.key === 'Escape') {
+    const isAtEnd = state.introWaitingForKey || (dom.introVideo && dom.introVideo.ended);
+    if (isAtEnd) {
       event.preventDefault();
       finishIntroVideo();
+      return;
     }
+    // While video is playing: ignore all keyboard keys completely
+    event.preventDefault();
     return;
   }
 
@@ -1786,6 +1813,7 @@ function cacheDom() {
   // Intro video overlay
   dom.introOverlay = document.getElementById('hub-intro-overlay');
   dom.introVideo = document.getElementById('hub-intro-video');
+  dom.introControls = document.getElementById('hub-intro-controls');
   dom.introMuteBtn = document.getElementById('hub-intro-mute-btn');
   dom.introSkipBtn = document.getElementById('hub-intro-skip-btn');
 
@@ -1973,12 +2001,38 @@ function bindEvents() {
 
   // Intro video overlay handlers
   if (dom.introVideo) {
-    dom.introVideo.addEventListener('ended', () => finishIntroVideo());
+    dom.introVideo.addEventListener('ended', handleIntroEnded);
+    dom.introVideo.addEventListener('timeupdate', () => {
+      if (dom.introVideo.duration && dom.introVideo.currentTime >= dom.introVideo.duration - 0.08) {
+        handleIntroEnded();
+      }
+    });
     dom.introVideo.addEventListener('error', () => finishIntroVideo());
   }
 
+  if (dom.introOverlay) {
+    dom.introOverlay.addEventListener('click', (e) => {
+      if (state.introWaitingForKey && e.target !== dom.introMuteBtn) {
+        finishIntroVideo();
+      }
+    });
+  }
+
   if (dom.introSkipBtn) {
-    dom.introSkipBtn.addEventListener('click', () => finishIntroVideo());
+    dom.introSkipBtn.addEventListener('keydown', (e) => {
+      if (state.introPlaying && !state.introWaitingForKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+    dom.introSkipBtn.addEventListener('click', (e) => {
+      // Ignore synthetic keyboard clicks while playing
+      if (e.detail === 0 && state.introPlaying && !state.introWaitingForKey) {
+        e.preventDefault();
+        return;
+      }
+      finishIntroVideo();
+    });
   }
 
   if (dom.introMuteBtn && dom.introVideo) {
@@ -2059,7 +2113,9 @@ const Hub = {
 
   destroy() {
     state.introPlaying = false;
+    state.introWaitingForKey = false;
     state.introDoneCallback = null;
+    if (dom.introControls) dom.introControls.hidden = false;
     if (dom.introVideo) {
       dom.introVideo.pause();
       dom.introVideo.removeAttribute('src');
