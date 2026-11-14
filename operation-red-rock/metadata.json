@@ -1,8 +1,0 @@
-{
-  "name": "Operation Red Rock",
-  "description": "Mission Hub for Operation Red Rock, a 3D Mars rover training and sample retrieval web game.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
