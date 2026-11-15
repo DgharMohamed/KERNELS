@@ -1,10 +1,10 @@
-# Planetary Rover Logistics & Analog Training Simulator (Operation Red Rock)
+# Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars
 
-A 3D simulation game built for the NASA Space Apps Challenge. Players operate an autonomous planetary rover ("robocart") across scientifically accurate terrain on Earth analog sites and Mars.
+An educational web app that helps people learn how to identify Earth locations that can serve as analogs for Moon base sites and Mars missions. Interactive challenges let learners test their understanding, while a 3D rover game lets them play and simulate rover missions on a Mars map provided by NASA.
 
 ## Overview
 
-The simulator models logistical missions—transporting cargo between research outposts and collecting geological samples—using real NASA and USGS planetary datasets.
+The app combines learning and play: users explore planetary analog concepts, take challenges to check what they have learned, and operate a rover in a 3D Mars mission simulation. Missions include transporting cargo between research outposts and collecting geological samples.
 
 ### Earth-to-Space Training Loop
 
