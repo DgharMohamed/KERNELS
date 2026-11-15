@@ -13,7 +13,7 @@ const LINKS = {
 // Add one line here to add a new page to the header and footer:
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: LINKS.home },
-  { id: 'learning', label: 'Learning', href: LINKS.learning },
+  { id: 'learning', label: 'Learning & Map', href: LINKS.learning },
   { id: 'challenges', label: 'Challenges', href: LINKS.challenges },
   { id: 'game', label: 'Game', href: LINKS.game, isAccent: true }
 ];
@@ -46,9 +46,9 @@ const TEXT = {
     {
       number: 'PHASE // 03',
       icon: 'articles',
-      title: 'Read articles',
-      description: 'Short, easy articles about places on Mars and the Earth sites that look like them.',
-      buttonText: 'Read articles',
+      title: 'Explore Analogs & Mars Map',
+      description: 'Explore live NASA Mars Trek satellite maps and compare Earth analog sites side by side with Mars.',
+      buttonText: 'Explore map & data',
       href: LINKS.articles
     }
   ],
