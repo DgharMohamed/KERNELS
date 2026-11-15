@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://cag2oasdiog30"]
+
+[ext_resource type="Script" uid="uid://rw4kbfdcowi7" path="res://scripts/test_map.gd" id="1_6ulkd"]
+
+[node name="TestMap" type="Node2D" unique_id=911008939]
+script = ExtResource("1_6ulkd")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=423424809]
+
+[node name="Z1_Green" type="ColorRect" parent="Visuals" unique_id=1271402766]
+offset_right = 2600.0
+offset_bottom = 1600.0
+color = Color(0.18039216, 0.49019608, 0.19607843, 1)
+
+[node name="Z2_Yellow" type="ColorRect" parent="Visuals" unique_id=1884769835]
+offset_left = 700.0
+offset_top = 200.0
+offset_right = 2400.0
+offset_bottom = 1400.0
+color = Color(0.9843137, 0.7529412, 0.1764706, 1)
+
+[node name="Ramp_1_to_2" type="ColorRect" parent="Visuals" unique_id=466013775]
+offset_left = 500.0
+offset_top = 700.0
+offset_right = 700.0
+offset_bottom = 900.0
+color = Color(0.54509807, 0.7647059, 0.2901961, 1)
+
+[node name="Z3_Red" type="ColorRect" parent="Visuals" unique_id=1367645441]
+offset_left = 1450.0
+offset_top = 400.0
+offset_right = 2250.0
+offset_bottom = 1200.0
+color = Color(0.827451, 0.18431373, 0.18431373, 1)
+
+[node name="Ramp_2_to_3" type="ColorRect" parent="Visuals" unique_id=867833044]
+offset_left = 1250.0
+offset_top = 700.0
+offset_right = 1450.0
+offset_bottom = 900.0
+color = Color(0.9607843, 0.4862745, 0, 1)
+
+[node name="Labels" type="Node2D" parent="." unique_id=401686648]
+
+[node name="Label_Z1" type="Label" parent="Labels" unique_id=636417218]
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 101.0
+offset_bottom = 123.0
+text = "LEVEL 1: LOWLAND / BASIN (Z1)
+Elevation: 0m | Color: Green
+Normal Traction & Baseline Gravity"
+
+[node name="Label_Ramp12" type="Label" parent="Labels" unique_id=1064326070]
+offset_left = 480.0
+offset_top = 650.0
+offset_right = 481.0
+offset_bottom = 673.0
+text = ">> RAMP 1 -> 2 (Slope: +12°) >>"
+
+[node name="Label_Z2" type="Label" parent="Labels" unique_id=1935605541]
+offset_left = 740.0
+offset_top = 230.0
+offset_right = 741.0
+offset_bottom = 253.0
+text = "LEVEL 2: MIDLAND / PLAINS (Z2)
+Elevation: 50m | Color: Yellow
+Mid-Plateau Base Camp & Logistics Corridors"
+
+[node name="Label_Ramp23" type="Label" parent="Labels" unique_id=1638090925]
+offset_left = 1230.0
+offset_top = 650.0
+offset_right = 1231.0
+offset_bottom = 673.0
+text = ">> RAMP 2 -> 3 (Slope: +18°) >>"
+
+[node name="Label_Z3" type="Label" parent="Labels" unique_id=1811748650]
+offset_left = 1480.0
+offset_top = 430.0
+offset_right = 1481.0
+offset_bottom = 453.0
+text = "LEVEL 3: HIGHLAND / CRATER RIM (Z3)
+Elevation: 120m | Color: Red
+High Solar Exposure & Geology Samples"
+
+[node name="Cliffs" type="StaticBody2D" parent="." unique_id=1292433130]
