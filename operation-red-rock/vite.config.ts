@@ -2,7 +2,10 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import {defineConfig, type Plugin} from 'vite';
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 function plainHubAssetsPlugin(): Plugin {
   const assetMime: Record<string, string> = {
@@ -20,9 +23,10 @@ function plainHubAssetsPlugin(): Plugin {
           next();
           return;
         }
-        const filePath = path.resolve(__dirname, '.' + cleanUrl);
+        const filePath = path.resolve(projectRoot, '.' + cleanUrl);
         if (fs.existsSync(filePath)) {
           res.setHeader('Content-Type', mime);
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
           res.end(fs.readFileSync(filePath, 'utf-8'));
           return;
         }
@@ -37,8 +41,11 @@ export default defineConfig(() => {
     plugins: [plainHubAssetsPlugin(), react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(projectRoot, '.'),
       },
+    },
+    optimizeDeps: {
+      exclude: ['three'],
     },
     build: {
       rollupOptions: {

@@ -7,13 +7,16 @@
 import * as THREE from 'three';
 import {
   ACHIEVEMENTS,
+  ANALOG_CHALLENGES,
   CODEX_ENTRIES,
   CREDITS_DATA,
   DEMO_PLAYER_DATA,
+  GALE_CRATER_CHRONICLE,
   HUB_COPY,
   INTRO_VIDEO_SRC,
   LOADING_TIPS,
   MISSIONS,
+  NASA_OFFICIAL_DATASETS,
   ROBOTS,
   STORAGE_KEY,
   WORKSHOP_UPGRADES,
@@ -25,7 +28,7 @@ import {
 // 1. DATA & CONSTANTS
 // ============================================================================
 
-const VALID_SCREENS = new Set(['loading', 'home', 'garage', 'missions', 'codex', 'settings']);
+const VALID_SCREENS = new Set(['loading', 'home', 'garage', 'missions', 'challenges', 'codex', 'settings']);
 const VALID_QUALITIES = new Set(['Low', 'Medium', 'High']);
 const VALID_UPGRADE_KEYS = ['wheels', 'scanner', 'battery', 'solar', 'dustCover', 'repairKits'];
 const MAX_STARS = 150;
@@ -54,6 +57,11 @@ const state = {
   selectedRobotId: 'explorer',
   inspectedRobotId: 'explorer',
   selectedMissionId: 'training1',
+  galePhaseIndex: 0,
+  challengeKey: 'terrain',
+  challengeStep: 'intro',
+  challengeSelected: null,
+  challengeAttempts: 0,
   playerData: createDefaultPlayerData(),
   settings: createDefaultSettings(window.innerWidth <= 768),
   callbacks: {
@@ -84,6 +92,16 @@ function sanitizeCallsign(raw) {
   if (typeof raw !== 'string') return 'ROVER01';
   const cleaned = raw.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12);
   return cleaned.length > 0 ? cleaned : 'ROVER01';
+}
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function validatePlayerData(raw) {
@@ -142,6 +160,11 @@ function validatePlayerData(raw) {
     ? Array.from(new Set(raw.achievements.filter((id) => typeof id === 'string' && validAchievementIds.has(id))))
     : [];
 
+  const validChallengeKeys = new Set(Object.keys(ANALOG_CHALLENGES));
+  const completedChallenges = Array.isArray(raw.completedChallenges)
+    ? Array.from(new Set(raw.completedChallenges.filter((k) => typeof k === 'string' && validChallengeKeys.has(k))))
+    : [];
+
   return {
     completedMissions,
     stars,
@@ -149,6 +172,7 @@ function validatePlayerData(raw) {
     build,
     unlockedCodex: Array.from(unlockedSet),
     achievements,
+    completedChallenges,
   };
 }
 
@@ -214,6 +238,7 @@ function clonePlayerData(data) {
     build: { ...data.build },
     unlockedCodex: [...data.unlockedCodex],
     achievements: [...data.achievements],
+    completedChallenges: Array.isArray(data.completedChallenges) ? [...data.completedChallenges] : [],
   };
 }
 
@@ -310,11 +335,15 @@ function launchMission(missionId) {
   });
 }
 
+const MUTE_ICON_SVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+const UNMUTE_ICON_SVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+
 function updateIntroMuteButton() {
   if (!dom.introMuteBtn || !dom.introVideo) return;
-  dom.introMuteBtn.textContent = dom.introVideo.muted
-    ? HUB_COPY.intro.unmuteLabel
-    : HUB_COPY.intro.muteLabel;
+  const isMuted = dom.introVideo.muted;
+  dom.introMuteBtn.innerHTML = isMuted ? MUTE_ICON_SVG : UNMUTE_ICON_SVG;
+  dom.introMuteBtn.setAttribute('aria-label', isMuted ? HUB_COPY.intro.unmuteLabel : HUB_COPY.intro.muteLabel);
+  dom.introMuteBtn.setAttribute('title', isMuted ? HUB_COPY.intro.unmuteLabel : HUB_COPY.intro.muteLabel);
 }
 
 function playIntroVideo(onComplete) {
@@ -518,6 +547,11 @@ function handleGlobalKeydown(event) {
       }
       return;
     }
+    if (dom.galeModal && !dom.galeModal.hidden) {
+      event.preventDefault();
+      closeGaleModal();
+      return;
+    }
     if (dom.creditsModal && !dom.creditsModal.hidden) {
       event.preventDefault();
       dom.creditsModal.hidden = true;
@@ -698,6 +732,22 @@ function renderHomeScreen() {
   if (dom.navCallsignValue) dom.navCallsignValue.textContent = state.settings.callsign;
   if (dom.homeCallsign) dom.homeCallsign.textContent = state.settings.callsign;
   if (dom.homeRover) dom.homeRover.textContent = robot.name;
+  if (dom.homeRoverName) dom.homeRoverName.textContent = robot.name;
+  if (dom.homeRoverRole) dom.homeRoverRole.textContent = robot.role;
+
+  if (dom.homeRoverPills) {
+    dom.homeRoverPills.innerHTML = ROBOTS.map((r) => {
+      const active = r.id === state.selectedRobotId ? 'is-active' : '';
+      const dotColor = '#' + r.palette.body.toString(16).padStart(6, '0');
+      return `<button type="button" class="hub-home-rover-pill ${active}" data-rover-id="${r.id}" aria-label="Select ${r.name}">
+        <span class="hub-home-pill-dot" style="background-color: ${dotColor}"></span>
+        ${r.name}
+      </button>`;
+    }).join('');
+  }
+
+  setPreviewRobot(robot);
+
   if (dom.homeProgress) {
     dom.homeProgress.textContent = `${completedCount} / ${playableMissions.length} Missions · ${totalStars} / ${playableMissions.length * 3} Stars`;
   }
@@ -708,6 +758,23 @@ function renderHomeScreen() {
   if (reducedMotionQuery.matches) {
     drawStarfield(0);
   }
+}
+
+function selectHomeRobotById(robotId) {
+  const robot = ROBOTS.find((r) => r.id === robotId);
+  if (!robot) return;
+  state.selectedRobotId = robot.id;
+  state.inspectedRobotId = robot.id;
+  saveToStorage();
+  setPreviewRobot(robot);
+  nudgePreviewSpin();
+  renderHomeScreen();
+}
+
+function cycleHomeRover(direction) {
+  const currentIndex = ROBOTS.findIndex((r) => r.id === state.selectedRobotId);
+  const nextIndex = (currentIndex + direction + ROBOTS.length) % ROBOTS.length;
+  selectHomeRobotById(ROBOTS[nextIndex].id);
 }
 
 // ============================================================================
@@ -1215,17 +1282,34 @@ function renderCodexScreen() {
       if (!unlocked) {
         return `
           <article class="hub-codex-card is-locked">
-            <div class="hub-codex-locked-mark" aria-hidden="true">?</div>
-            <h3 class="hub-codex-title">${HUB_COPY.codex.lockedTitle}</h3>
-            <p class="hub-codex-body">${HUB_COPY.codex.lockedHintPrefix} ${entry.unlockHint}</p>
+            <div class="hub-codex-image-wrap is-locked">
+              ${entry.image ? `<img class="hub-codex-image" src="${entry.image}" alt="Locked Intel" loading="lazy" />` : ''}
+              <div class="hub-codex-locked-overlay">
+                <div class="hub-codex-locked-mark" aria-hidden="true">?</div>
+              </div>
+            </div>
+            <div class="hub-codex-content">
+              <span class="hub-codex-category is-locked-cat">Classified · ${entry.category}</span>
+              <h3 class="hub-codex-title">${HUB_COPY.codex.lockedTitle}</h3>
+              <p class="hub-codex-body">${HUB_COPY.codex.lockedHintPrefix} ${entry.unlockHint}</p>
+            </div>
           </article>
         `;
       }
       return `
-        <article class="hub-codex-card is-unlocked">
-          <span class="hub-codex-category">${entry.category}</span>
-          <h3 class="hub-codex-title">${entry.title}</h3>
-          <p class="hub-codex-body">${entry.text}</p>
+        <article class="hub-codex-card is-unlocked ${entry.id === 'gale-crater' ? 'is-interactive-entry' : ''}" ${entry.id === 'gale-crater' ? 'data-open-gale="true" title="Click to open Gale Crater Expedition Chronicle"' : ''}>
+          ${entry.image ? `
+            <div class="hub-codex-image-wrap">
+              <img class="hub-codex-image" src="${entry.image}" alt="${entry.title}" loading="lazy" />
+              ${entry.id === 'gale-crater' ? '<span class="hub-codex-interactive-badge">Chronicle ↗</span>' : ''}
+            </div>
+          ` : ''}
+          <div class="hub-codex-content">
+            <span class="hub-codex-category">${entry.category}</span>
+            <h3 class="hub-codex-title">${entry.title}</h3>
+            <p class="hub-codex-body">${entry.text}</p>
+            ${entry.id === 'gale-crater' ? '<button type="button" class="hub-btn hub-btn-sm hub-btn-secondary hub-codex-open-dossier" data-open-gale="true">Open Sector Chronicle ↗</button>' : ''}
+          </div>
         </article>
       `;
     }).join('');
@@ -1249,6 +1333,693 @@ function renderCodexScreen() {
         </div>
       `;
     }).join('');
+  }
+
+  // NASA Official Datasets & Scientific Sources
+  if (dom.nasaSourcesGrid) {
+    dom.nasaSourcesGrid.innerHTML = NASA_OFFICIAL_DATASETS.map((ds) => `
+      <article class="hub-nasa-source-card">
+        <div class="hub-nasa-card-top">
+          <span class="hub-nasa-card-category">${ds.category}</span>
+          <span class="hub-nasa-card-badge">${ds.badge}</span>
+        </div>
+        <h4 class="hub-nasa-card-title">${ds.title}</h4>
+        <p class="hub-nasa-card-desc">${ds.desc}</p>
+        <div class="hub-nasa-card-footer">
+          <span class="hub-nasa-agency">${ds.agency}</span>
+          <a href="${ds.url}" target="_blank" rel="noopener noreferrer" class="hub-nasa-link-btn">
+            Read on NASA.gov ↗
+          </a>
+        </div>
+      </article>
+    `).join('');
+  }
+}
+
+function openGaleModal(phaseIndex = 0) {
+  state.galePhaseIndex = Math.max(0, Math.min(GALE_CRATER_CHRONICLE.length - 1, phaseIndex));
+  if (dom.galeModal) {
+    dom.galeModal.hidden = false;
+    renderGaleChronicle();
+  }
+}
+
+function closeGaleModal() {
+  if (dom.galeModal) {
+    dom.galeModal.hidden = true;
+    if (dom.openGaleDossierBtn) {
+      dom.openGaleDossierBtn.focus();
+    }
+  }
+}
+
+function setGalePhase(phaseIndex) {
+  const nextIdx = Math.max(0, Math.min(GALE_CRATER_CHRONICLE.length - 1, phaseIndex));
+  state.galePhaseIndex = nextIdx;
+  renderGaleChronicle();
+}
+
+function renderGaleChronicle() {
+  const chronicle = GALE_CRATER_CHRONICLE;
+  const current = chronicle[state.galePhaseIndex];
+  if (!current) return;
+
+  // Render Stepper Tabs
+  if (dom.galeStepper) {
+    dom.galeStepper.innerHTML = chronicle.map((phase, idx) => {
+      const isActive = idx === state.galePhaseIndex;
+      const isPast = idx < state.galePhaseIndex;
+      return `
+        <button type="button" class="hub-gale-step-btn ${isActive ? 'is-active' : ''} ${isPast ? 'is-past' : ''}" data-phase-idx="${idx}" role="tab" aria-selected="${isActive}">
+          <span class="hub-gale-step-num">0${phase.phase}</span>
+          <span class="hub-gale-step-tag">${phase.shortTag || phase.tag}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  // Render Phase Content
+  if (dom.galePhaseContent) {
+    const detailsHtml = current.details.map((d) => `
+      <li class="hub-gale-detail-item">
+        <span class="hub-gale-detail-bullet" aria-hidden="true">▸</span>
+        <span>${d}</span>
+      </li>
+    `).join('');
+
+    dom.galePhaseContent.innerHTML = `
+      <div class="hub-gale-phase-grid">
+        <div class="hub-gale-phase-info">
+          <div class="hub-gale-phase-header-bar">
+            <div class="hub-gale-phase-badge">
+              <span class="hub-gale-badge-phase">PHASE 0${current.phase}</span>
+              <span class="hub-gale-phase-dot">·</span>
+              <span class="hub-gale-badge-tag">${current.tag}</span>
+            </div>
+            ${current.source ? `
+              <a href="${current.source.url}" target="_blank" rel="noopener noreferrer" class="hub-gale-top-source-link" title="Open official NASA research in a new tab">
+                <span class="hub-gale-source-pulse"></span>
+                <span>NASA Source ↗</span>
+              </a>
+            ` : ''}
+          </div>
+          <h3 class="hub-gale-phase-title">${current.title}</h3>
+          <p class="hub-gale-phase-sub">${current.subtitle}</p>
+          <p class="hub-gale-phase-lead">${current.lead}</p>
+          <ul class="hub-gale-phase-details">${detailsHtml}</ul>
+
+          ${current.source ? `
+            <div class="hub-gale-source-banner">
+              <div class="hub-gale-source-banner-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+              </div>
+              <div class="hub-gale-source-banner-content">
+                <span class="hub-gale-source-banner-label">OFFICIAL NASA DOCUMENTATION</span>
+                <span class="hub-gale-source-banner-title">${current.source.name}</span>
+              </div>
+              <a href="${current.source.url}" target="_blank" rel="noopener noreferrer" class="hub-gale-source-banner-btn">
+                <span>Read on NASA.gov</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="hub-gale-phase-sidebar">
+          <div class="hub-gale-media-frame">
+            <img src="${current.image}" alt="${current.title}" class="hub-gale-media-img" />
+            <div class="hub-gale-media-meta">
+              <span>Telemetry Map · Gale Sector</span>
+              ${current.source ? `
+                <a href="${current.source.url}" target="_blank" rel="noopener noreferrer" class="hub-gale-media-link">
+                  NASA Telemetry ↗
+                </a>
+              ` : '<span class="hub-mono-value">Sector 0' + current.phase + '</span>'}
+            </div>
+          </div>
+
+          <div class="hub-gale-stat-card">
+            <span class="hub-muted-label">${current.scienceStat.label}</span>
+            <span class="hub-gale-stat-value">${current.scienceStat.value}</span>
+          </div>
+
+          <div class="hub-gale-fact-box">
+            <span class="hub-gale-fact-label">MISSION INSIGHT</span>
+            <p class="hub-gale-fact-text">${current.keyFact}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Update Footer Controls
+  if (dom.galePhaseIndicator) {
+    const dotsHtml = chronicle.map((_, i) => `
+      <span class="hub-gale-dot ${i === state.galePhaseIndex ? 'is-active' : ''} ${i < state.galePhaseIndex ? 'is-past' : ''}"></span>
+    `).join('');
+    dom.galePhaseIndicator.innerHTML = `
+      <div class="hub-gale-dots">${dotsHtml}</div>
+      <span class="hub-gale-counter-text">Phase ${current.phase} of ${chronicle.length}</span>
+    `;
+  }
+  if (dom.galePrevBtn) {
+    dom.galePrevBtn.disabled = state.galePhaseIndex === 0;
+  }
+  if (dom.galeNextBtn) {
+    if (state.galePhaseIndex === chronicle.length - 1) {
+      dom.galeNextBtn.textContent = 'Finish Exploration';
+    } else {
+      dom.galeNextBtn.textContent = 'Next Phase →';
+    }
+  }
+}
+
+// ============================================================================
+// 12.5. SCREEN: ANALOG CHALLENGES
+// ============================================================================
+
+const CHALLENGE_STEP_META = {
+  intro: ['STEP 1 OF 3 · MISSION BRIEFING', '20%'],
+  learn: ['STEP 2 OF 3 · SCIENTIFIC CRITERION', '45%'],
+  quiz: ['STEP 3 OF 3 · KNOWLEDGE CHECK', '70%'],
+  feedback: ['EVALUATION · SCIENTIFIC FEEDBACK', '90%'],
+  complete: ['MISSION DEBRIEF · CHALLENGE COMPLETED', '100%'],
+};
+
+function getChallengeStatus(key) {
+  const completed = Array.isArray(state.playerData.completedChallenges)
+    ? state.playerData.completedChallenges
+    : [];
+
+  if (completed.includes(key)) {
+    return 'completed';
+  }
+
+  if (key === 'terrain') {
+    return 'unlocked';
+  }
+  if (key === 'climate') {
+    return completed.includes('terrain') ? 'unlocked' : 'locked';
+  }
+  if (key === 'global') {
+    return completed.includes('climate') ? 'unlocked' : 'locked';
+  }
+
+  return 'locked';
+}
+
+function getChallengePrereqName(key) {
+  if (key === 'climate') return '01 Terrain Morphology';
+  if (key === 'global') return '02 Climate & REMS';
+  return '';
+}
+
+function switchChallenge(key) {
+  if (!ANALOG_CHALLENGES[key]) return;
+  const status = getChallengeStatus(key);
+  if (status === 'locked') {
+    const prereq = getChallengePrereqName(key);
+    if (dom.challengeRailFeedback) {
+      dom.challengeRailFeedback.textContent = `Locked: Complete Challenge ${prereq} first!`;
+      dom.challengeRailFeedback.classList.add('is-alert');
+      setTimeout(() => {
+        if (dom.challengeRailFeedback) dom.challengeRailFeedback.classList.remove('is-alert');
+      }, 2500);
+    }
+    return;
+  }
+
+  state.challengeKey = key;
+  state.challengeStep = 'intro';
+  state.challengeSelected = null;
+  state.challengeAttempts = 0;
+  renderChallengesScreen();
+}
+
+function setChallengeStep(stepName) {
+  if (!CHALLENGE_STEP_META[stepName]) return;
+  state.challengeStep = stepName;
+  renderChallengesScreen();
+}
+
+function selectChallengeCandidate(id) {
+  state.challengeSelected = id;
+  const challenge = ANALOG_CHALLENGES[state.challengeKey];
+  if (!challenge) return;
+
+  const cards = dom.challengeCandidateGrid ? dom.challengeCandidateGrid.querySelectorAll('.hub-challenge-candidate-card') : [];
+  cards.forEach((card) => {
+    const isSelected = card.getAttribute('data-candidate-id') === id;
+    card.classList.toggle('is-selected', isSelected);
+    card.setAttribute('aria-pressed', String(isSelected));
+  });
+
+  if (dom.challengeSubmitBtn) {
+    dom.challengeSubmitBtn.disabled = false;
+  }
+  if (dom.challengeQuizMsg) {
+    dom.challengeQuizMsg.textContent = 'Candidate selected. Submit when you are ready to evaluate.';
+  }
+}
+
+function submitChallengeAnswer() {
+  if (!state.challengeSelected) return;
+  state.challengeAttempts++;
+  state.challengeStep = 'feedback';
+  renderChallengesScreen();
+}
+
+function markChallengeCompleted() {
+  const challengeKey = state.challengeKey;
+  if (!Array.isArray(state.playerData.completedChallenges)) {
+    state.playerData.completedChallenges = [];
+  }
+  if (!state.playerData.completedChallenges.includes(challengeKey)) {
+    state.playerData.completedChallenges.push(challengeKey);
+    saveToStorage();
+  }
+  state.challengeStep = 'complete';
+  renderChallengesScreen();
+}
+
+function renderMarsBaselineHtml(baseline) {
+  if (!baseline) return '';
+  const metricsHtml = (baseline.metrics || []).map((m) => `
+    <div class="hub-baseline-metric-card">
+      <span class="hub-baseline-metric-label">${escapeHtml(m.label)}</span>
+      <span class="hub-baseline-metric-value hub-mono-value">${escapeHtml(m.value)}</span>
+      ${m.sub ? `<span class="hub-baseline-metric-sub">${escapeHtml(m.sub)}</span>` : ''}
+    </div>
+  `).join('');
+
+  return `
+    <div class="hub-baseline-box">
+      <div class="hub-baseline-header">
+        <div class="hub-baseline-title-group">
+          <span class="hub-baseline-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            ${escapeHtml(baseline.badge || 'NASA MARS REFERENCE BENCHMARK')}
+          </span>
+          <h4 class="hub-baseline-title">${escapeHtml(baseline.title)}</h4>
+        </div>
+        ${baseline.sourceUrl ? `
+          <a href="${baseline.sourceUrl}" target="_blank" rel="noopener noreferrer" class="hub-baseline-source-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>${escapeHtml(baseline.sourceName || 'NASA Planetary Data System (PDS) Telemetry ↗')}</span>
+          </a>
+        ` : ''}
+      </div>
+      <div class="hub-baseline-metrics-grid">
+        ${metricsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderChallengesScreen() {
+  // If active challenge is locked, fallback to the latest unlocked one
+  if (getChallengeStatus(state.challengeKey) === 'locked') {
+    const keys = ['terrain', 'climate', 'global'];
+    const unlocked = keys.filter((k) => getChallengeStatus(k) !== 'locked');
+    state.challengeKey = unlocked[unlocked.length - 1] || 'terrain';
+  }
+
+  const challenge = ANALOG_CHALLENGES[state.challengeKey];
+  if (!challenge) return;
+
+  const completedList = Array.isArray(state.playerData.completedChallenges)
+    ? state.playerData.completedChallenges
+    : [];
+  const completedCount = completedList.length;
+  const pct = Math.round((completedCount / 3) * 100);
+
+  // Update Top Counter & Rail Progress Card
+  if (dom.challengeCounter) {
+    dom.challengeCounter.textContent = `${completedCount} / 3 Mastered`;
+  }
+  if (dom.challengeRailPercent) {
+    dom.challengeRailPercent.textContent = `${pct}%`;
+  }
+  if (dom.challengeRailBar) {
+    dom.challengeRailBar.style.width = `${pct}%`;
+  }
+  if (dom.challengeRailFeedback && !dom.challengeRailFeedback.classList.contains('is-alert')) {
+    dom.challengeRailFeedback.textContent = completedCount === 3
+      ? 'All 3 analog challenges completed! Excellent research work.'
+      : `${completedCount} of 3 sectors mastered. Solve active sector to advance.`;
+  }
+
+  // Render Challenge Rail Items (Ladder Cards)
+  if (dom.challengeNav) {
+    const challengeKeys = ['terrain', 'climate', 'global'];
+    dom.challengeNav.innerHTML = challengeKeys.map((key) => {
+      const c = ANALOG_CHALLENGES[key];
+      const status = getChallengeStatus(key);
+      const isActive = key === state.challengeKey;
+
+      let badgeHtml = '';
+      if (status === 'completed') {
+        badgeHtml = `
+          <span class="hub-challenge-badge-done">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            DONE
+          </span>
+        `;
+      } else if (status === 'unlocked') {
+        badgeHtml = `
+          <span class="hub-challenge-badge-open" title="Unlocked & In Progress">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+            </svg>
+            OPEN
+          </span>
+        `;
+      } else {
+        badgeHtml = `
+          <span class="hub-challenge-badge-locked" title="Locked: Complete previous challenge first">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            LOCKED
+          </span>
+        `;
+      }
+
+      const statusText = status === 'completed'
+        ? 'Mastered · Click to Replay'
+        : status === 'unlocked'
+        ? (isActive ? 'Active Research Sector' : 'Available to Explore')
+        : `Locked · Requires ${getChallengePrereqName(key)}`;
+
+      return `
+        <button
+          type="button"
+          class="hub-challenge-ladder-card is-${status} ${isActive ? 'is-active' : ''}"
+          data-challenge-key="${key}"
+          role="option"
+          aria-selected="${isActive}"
+          aria-disabled="${status === 'locked'}"
+          title="${status === 'locked' ? 'Locked: Complete previous challenge first' : c.name}"
+        >
+          <div class="hub-challenge-ladder-top">
+            <span class="hub-challenge-ladder-num">0${c.number}</span>
+            <div class="hub-challenge-ladder-badge-wrap">
+              ${badgeHtml}
+            </div>
+          </div>
+          <h4 class="hub-challenge-ladder-title">${escapeHtml(c.name)}</h4>
+          <p class="hub-challenge-ladder-criterion">${escapeHtml(c.criterion)}</p>
+          <div class="hub-challenge-ladder-footer">
+            <span class="hub-challenge-ladder-status-text">${escapeHtml(statusText)}</span>
+          </div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  // Update Hero Banner
+  if (dom.challengeHeroTag) {
+    dom.challengeHeroTag.textContent = `Mars Analog Field Training · Challenge ${challenge.number}`;
+  }
+  if (dom.challengeHeroTitle) {
+    dom.challengeHeroTitle.textContent = challenge.title;
+  }
+  if (dom.challengeHeroDesc) {
+    dom.challengeHeroDesc.textContent = challenge.description;
+  }
+  if (dom.challengeHeroCriterion) {
+    dom.challengeHeroCriterion.textContent = challenge.criterion;
+  }
+
+  // Update Progress Bar
+  const stepMeta = CHALLENGE_STEP_META[state.challengeStep] || CHALLENGE_STEP_META.intro;
+  if (dom.challengeStepLabel) {
+    dom.challengeStepLabel.textContent = stepMeta[0];
+  }
+  if (dom.challengeProgressLabel) {
+    dom.challengeProgressLabel.textContent = stepMeta[1];
+  }
+  if (dom.challengeProgressBar) {
+    dom.challengeProgressBar.style.width = stepMeta[1];
+  }
+
+  // Toggle Step Panels
+  if (dom.challengeSteps) {
+    for (const [stepKey, el] of Object.entries(dom.challengeSteps)) {
+      if (el) {
+        el.hidden = stepKey !== state.challengeStep;
+      }
+    }
+  }
+
+  // Update Sidebar Step Indicators
+  const sideStepIndicators = document.querySelectorAll('.hub-challenge-side-step');
+  sideStepIndicators.forEach((ind) => {
+    const indStep = ind.getAttribute('data-step-indicator');
+    const isStepActive = indStep === state.challengeStep ||
+      (state.challengeStep === 'feedback' && indStep === 'quiz') ||
+      (state.challengeStep === 'complete' && indStep === 'quiz');
+    ind.classList.toggle('is-active', isStepActive);
+  });
+
+  if (dom.challengeSidebarObjective) {
+    dom.challengeSidebarObjective.textContent = challenge.objective;
+  }
+  if (dom.challengeReferences) {
+    dom.challengeReferences.innerHTML = challenge.refs;
+  }
+
+  // Step 1: INTRO
+  if (state.challengeStep === 'intro') {
+    if (dom.challengeIntroLead) {
+      dom.challengeIntroLead.textContent = challenge.intro;
+    }
+    if (dom.challengeIntroFeatures) {
+      dom.challengeIntroFeatures.innerHTML = challenge.features.map(([title, desc]) => `
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">${escapeHtml(title)}</strong>
+          <p class="hub-challenge-feature-desc">${escapeHtml(desc)}</p>
+        </div>
+      `).join('');
+    }
+    if (dom.challengeIntroRule) {
+      dom.challengeIntroRule.innerHTML = `<strong>Field Comparison Rule:</strong> ${escapeHtml(challenge.rule)}`;
+    }
+  }
+
+  // Step 2: LEARN
+  if (state.challengeStep === 'learn') {
+    if (dom.challengeLearnTitle) {
+      dom.challengeLearnTitle.textContent = challenge.learnTitle;
+    }
+    if (dom.challengeLearnLead) {
+      dom.challengeLearnLead.textContent = challenge.learnLead;
+    }
+    if (dom.challengeLearnBaseline) {
+      dom.challengeLearnBaseline.innerHTML = renderMarsBaselineHtml(challenge.marsBaseline);
+    }
+    if (dom.challengeLearnFeatures) {
+      dom.challengeLearnFeatures.innerHTML = challenge.learnFeatures.map(([title, desc]) => `
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">${escapeHtml(title)}</strong>
+          <p class="hub-challenge-feature-desc">${escapeHtml(desc)}</p>
+        </div>
+      `).join('');
+    }
+    if (dom.challengeLearnFact) {
+      dom.challengeLearnFact.innerHTML = `<strong>Scientific Evidence:</strong> ${escapeHtml(challenge.learnFact)}`;
+    }
+  }
+
+  // Step 3: QUIZ
+  if (state.challengeStep === 'quiz') {
+    if (dom.challengeQuizTitle) {
+      dom.challengeQuizTitle.textContent = 'Choose the Best Earth Analog';
+    }
+    if (dom.challengeQuizQuestion) {
+      dom.challengeQuizQuestion.textContent = challenge.question;
+    }
+    if (dom.challengeQuizCriterion) {
+      dom.challengeQuizCriterion.textContent = `Active Rule: ${challenge.criterion}`;
+    }
+    if (dom.challengeQuizBaseline) {
+      dom.challengeQuizBaseline.innerHTML = renderMarsBaselineHtml(challenge.marsBaseline);
+    }
+    if (dom.challengeCandidateGrid) {
+      const letters = ['A', 'B', 'C', 'D'];
+      dom.challengeCandidateGrid.innerHTML = challenge.candidates.map((cand, idx) => {
+        const isSelected = cand.id === state.challengeSelected;
+        const metricsHtml = (cand.metrics || []).map((m) => `
+          <div class="hub-candidate-metric-item">
+            <span class="hub-candidate-metric-label">${escapeHtml(m.label)}</span>
+            <span class="hub-candidate-metric-val hub-mono-value">${escapeHtml(m.value)}</span>
+          </div>
+        `).join('');
+
+        return `
+          <button type="button" class="hub-challenge-candidate-card ${isSelected ? 'is-selected' : ''}" data-candidate-id="${cand.id}" role="radio" aria-checked="${isSelected}">
+            <div class="hub-challenge-candidate-img-wrap">
+              <img src="${cand.image}" alt="${escapeHtml(cand.name)}" class="hub-challenge-candidate-img" onerror="this.src='/assets/maps/mars_dust_storm.jpg'" />
+              <div class="hub-challenge-candidate-letter">${letters[idx] || idx + 1}</div>
+              <span class="hub-candidate-nasa-badge">NASA DATA</span>
+            </div>
+            <div class="hub-challenge-candidate-head">
+              <h4 class="hub-challenge-candidate-name">${escapeHtml(cand.name)}</h4>
+            </div>
+            <p class="hub-challenge-candidate-desc">${escapeHtml(cand.desc)}</p>
+
+            ${metricsHtml ? `
+              <div class="hub-candidate-telemetry-section">
+                <span class="hub-candidate-telemetry-heading">Field Telemetry & Dimensions:</span>
+                <div class="hub-candidate-metrics-grid">
+                  ${metricsHtml}
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="hub-challenge-candidate-link-wrap">
+              ${cand.nasaSourceUrl ? `
+                <a href="${cand.nasaSourceUrl}" target="_blank" rel="noopener noreferrer" class="hub-challenge-candidate-nasa-btn" onclick="event.stopPropagation()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>${escapeHtml(cand.nasaSourceLabel || 'Fetch NASA Data ↗')}</span>
+                </a>
+              ` : ''}
+              ${cand.source && cand.source !== cand.nasaSourceUrl ? `
+                <a href="${cand.source}" target="_blank" rel="noopener noreferrer" class="hub-challenge-candidate-link" onclick="event.stopPropagation()">
+                  <span>${escapeHtml(cand.sourceName || 'Scientific Reference ↗')}</span>
+                </a>
+              ` : ''}
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+    if (dom.challengeHintBox) {
+      dom.challengeHintBox.hidden = true;
+      dom.challengeHintBox.innerHTML = `<strong>Scientific Hint:</strong> ${escapeHtml(challenge.hint)}`;
+    }
+    if (dom.challengeSubmitBtn) {
+      dom.challengeSubmitBtn.disabled = !state.challengeSelected;
+    }
+    if (dom.challengeQuizMsg) {
+      dom.challengeQuizMsg.textContent = state.challengeSelected
+        ? 'Candidate selected. Submit when you are ready to evaluate.'
+        : 'Select one candidate above to continue.';
+    }
+  }
+
+  // Step 4: FEEDBACK
+  if (state.challengeStep === 'feedback') {
+    const isCorrect = state.challengeSelected === challenge.correct;
+    const selectedCand = challenge.candidates.find((c) => c.id === state.challengeSelected) || { name: 'Selected Candidate' };
+
+    if (dom.challengeFeedbackContent) {
+      if (isCorrect) {
+        dom.challengeFeedbackContent.innerHTML = `
+          <div class="hub-challenge-panel-tag">Scientific Evaluation</div>
+          <h3 class="hub-challenge-step-heading" style="color: var(--hub-green);">Correct Scientific Match!</h3>
+          <p class="hub-challenge-lead">${escapeHtml(challenge.correctTitle)}</p>
+          <div class="hub-challenge-feedback-box is-good">
+            <h4 class="hub-challenge-feedback-title">Why this is the supported answer:</h4>
+            <ul class="hub-challenge-feedback-list">
+              ${challenge.correctWhy.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}
+            </ul>
+            <div class="hub-challenge-feedback-takeaway">
+              <span class="hub-challenge-feedback-takeaway-label">Learning Takeaway</span>
+              <p class="hub-challenge-feedback-takeaway-text">${escapeHtml(challenge.takeaway)}</p>
+            </div>
+          </div>
+        `;
+      } else {
+        dom.challengeFeedbackContent.innerHTML = `
+          <div class="hub-challenge-panel-tag">Scientific Evaluation</div>
+          <h3 class="hub-challenge-step-heading" style="color: var(--hub-danger);">Not quite — let's compare the evidence</h3>
+          <p class="hub-challenge-lead">You selected <strong>${escapeHtml(selectedCand.name)}</strong>. While this is a real and informative environment, it is not the strongest match for this specific criterion.</p>
+          <div class="hub-challenge-feedback-box is-bad">
+            <h4 class="hub-challenge-feedback-title">Why this candidate falls short for this rule:</h4>
+            <p class="hub-challenge-feedback-text">${escapeHtml(challenge.wrongWhy)}</p>
+            <h4 class="hub-challenge-feedback-title" style="margin-top: 14px;">Why the correct analog is better supported:</h4>
+            <ul class="hub-challenge-feedback-list">
+              ${challenge.correctWhy.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}
+            </ul>
+          </div>
+          <p class="hub-challenge-lead" style="margin-top: 14px; font-size: 13px; color: var(--hub-muted);">${escapeHtml(challenge.takeaway)}</p>
+        `;
+      }
+    }
+
+    if (dom.challengeFeedbackActions) {
+      if (isCorrect) {
+        dom.challengeFeedbackActions.innerHTML = `
+          <button type="button" class="hub-btn hub-btn-primary hub-btn-lg" id="hub-challenge-complete-btn">
+            Complete Challenge & Record Field Report →
+          </button>
+        `;
+        const compBtn = document.getElementById('hub-challenge-complete-btn');
+        if (compBtn) {
+          compBtn.addEventListener('click', markChallengeCompleted);
+        }
+      } else {
+        dom.challengeFeedbackActions.innerHTML = `
+          <button type="button" class="hub-btn hub-btn-secondary" id="hub-challenge-review-btn">
+            Review Scientific Criterion
+          </button>
+          <button type="button" class="hub-btn hub-btn-primary" id="hub-challenge-retry-btn">
+            Try Again
+          </button>
+        `;
+        const reviewBtn = document.getElementById('hub-challenge-review-btn');
+        if (reviewBtn) {
+          reviewBtn.addEventListener('click', () => setChallengeStep('learn'));
+        }
+        const retryBtn = document.getElementById('hub-challenge-retry-btn');
+        if (retryBtn) {
+          retryBtn.addEventListener('click', () => {
+            state.challengeSelected = null;
+            setChallengeStep('quiz');
+          });
+        }
+      }
+    }
+  }
+
+  // Step 5: COMPLETE
+  if (state.challengeStep === 'complete') {
+    const selectedCand = challenge.candidates.find((c) => c.id === state.challengeSelected) || { name: 'Confirmed Match' };
+    if (dom.challengeCompleteLead) {
+      dom.challengeCompleteLead.textContent = `You have successfully mastered the ${challenge.name} Analog Challenge!`;
+    }
+    if (dom.challengeCompleteFeatures) {
+      dom.challengeCompleteFeatures.innerHTML = `
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">Challenge Mission</strong>
+          <p class="hub-challenge-feature-desc">${escapeHtml(challenge.name)}</p>
+        </div>
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">Applied Criterion</strong>
+          <p class="hub-challenge-feature-desc">${escapeHtml(challenge.criterion)}</p>
+        </div>
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">Verified Analog</strong>
+          <p class="hub-challenge-feature-desc">${escapeHtml(selectedCand.name)}</p>
+        </div>
+        <div class="hub-challenge-feature-card">
+          <strong class="hub-challenge-feature-title">Evaluation Attempts</strong>
+          <p class="hub-challenge-feature-desc">${state.challengeAttempts} attempt${state.challengeAttempts === 1 ? '' : 's'}</p>
+        </div>
+      `;
+    }
+    if (dom.challengeCompleteFact) {
+      dom.challengeCompleteFact.innerHTML = `<strong>Scientific Synthesis:</strong> ${escapeHtml(challenge.takeaway)}`;
+    }
+    if (dom.challengeNextBtn) {
+      const nextKey = state.challengeKey === 'terrain' ? 'climate' : state.challengeKey === 'climate' ? 'global' : 'terrain';
+      const nextLabel = state.challengeKey === 'terrain' ? 'Next: Climate & REMS →' : state.challengeKey === 'climate' ? 'Next: Global Analog Strategy →' : 'Back to Terrain Challenge';
+      dom.challengeNextBtn.textContent = nextLabel;
+      dom.challengeNextBtn.setAttribute('data-next-key', nextKey);
+    }
   }
 }
 
@@ -1717,6 +2488,9 @@ function renderActiveScreen() {
     case 'missions':
       renderMissionsScreen();
       break;
+    case 'challenges':
+      renderChallengesScreen();
+      break;
     case 'codex':
       renderCodexScreen();
       break;
@@ -1746,6 +2520,12 @@ function cacheDom() {
 
   // Home
   dom.homePreviewSlot = document.getElementById('hub-home-preview-slot');
+  dom.homeRoverPrevBtn = document.getElementById('hub-home-rover-prev');
+  dom.homeRoverNextBtn = document.getElementById('hub-home-rover-next');
+  dom.homeRoverName = document.getElementById('hub-home-rover-name');
+  dom.homeRoverRole = document.getElementById('hub-home-rover-role');
+  dom.homeRoverPills = document.getElementById('hub-home-rover-pills');
+  dom.homeGotoGarageBtn = document.getElementById('hub-home-goto-garage-btn');
   dom.homeCallsign = document.getElementById('hub-home-callsign');
   dom.homeRover = document.getElementById('hub-home-rover');
   dom.homeProgress = document.getElementById('hub-home-progress');
@@ -1779,9 +2559,72 @@ function cacheDom() {
   dom.detailLockReason = document.getElementById('hub-detail-lock-reason');
   dom.missionStartBtn = document.getElementById('hub-mission-start-btn');
 
+  // Challenges
+  dom.challengeCounter = document.getElementById('hub-challenges-counter');
+  dom.challengeNav = document.getElementById('hub-challenge-nav') || document.querySelector('.hub-challenge-nav-list') || document.querySelector('.hub-challenge-nav');
+  dom.challengeRailPercent = document.getElementById('hub-rail-status-percent');
+  dom.challengeRailBar = document.getElementById('hub-rail-progress-fill');
+  dom.challengeRailFeedback = document.getElementById('hub-rail-feedback-msg');
+  dom.challengeHeroTag = document.getElementById('hub-challenge-hero-tag');
+  dom.challengeHeroTitle = document.getElementById('hub-challenge-hero-title');
+  dom.challengeHeroDesc = document.getElementById('hub-challenge-hero-desc');
+  dom.challengeHeroCriterion = document.getElementById('hub-challenge-hero-criterion');
+  dom.challengeStepLabel = document.getElementById('hub-challenge-step-label');
+  dom.challengeProgressLabel = document.getElementById('hub-challenge-progress-label');
+  dom.challengeProgressBar = document.getElementById('hub-challenge-progress-bar');
+
+  dom.challengeSteps = {
+    intro: document.getElementById('hub-challenge-step-intro'),
+    learn: document.getElementById('hub-challenge-step-learn'),
+    quiz: document.getElementById('hub-challenge-step-quiz'),
+    feedback: document.getElementById('hub-challenge-step-feedback'),
+    complete: document.getElementById('hub-challenge-step-complete'),
+  };
+
+  dom.challengeIntroLead = document.getElementById('hub-challenge-intro-lead');
+  dom.challengeIntroFeatures = document.getElementById('hub-challenge-intro-features');
+  dom.challengeIntroRule = document.getElementById('hub-challenge-intro-rule');
+
+  dom.challengeLearnTitle = document.getElementById('hub-challenge-learn-title');
+  dom.challengeLearnLead = document.getElementById('hub-challenge-learn-lead');
+  dom.challengeLearnBaseline = document.getElementById('hub-challenge-learn-baseline');
+  dom.challengeLearnFeatures = document.getElementById('hub-challenge-learn-features');
+  dom.challengeLearnFact = document.getElementById('hub-challenge-learn-fact');
+
+  dom.challengeQuizTitle = document.getElementById('hub-challenge-quiz-title');
+  dom.challengeQuizQuestion = document.getElementById('hub-challenge-quiz-question');
+  dom.challengeQuizCriterion = document.getElementById('hub-challenge-quiz-criterion');
+  dom.challengeQuizBaseline = document.getElementById('hub-challenge-quiz-baseline');
+  dom.challengeCandidateGrid = document.getElementById('hub-challenge-candidate-grid');
+  dom.challengeHintBtn = document.getElementById('hub-challenge-hint-btn');
+  dom.challengeSubmitBtn = document.getElementById('hub-challenge-submit-btn');
+  dom.challengeQuizMsg = document.getElementById('hub-challenge-quiz-msg');
+  dom.challengeHintBox = document.getElementById('hub-challenge-hint-box');
+
+  dom.challengeFeedbackContent = document.getElementById('hub-challenge-feedback-content');
+  dom.challengeFeedbackActions = document.getElementById('hub-challenge-feedback-actions');
+
+  dom.challengeCompleteLead = document.getElementById('hub-challenge-complete-lead');
+  dom.challengeCompleteFeatures = document.getElementById('hub-challenge-complete-features');
+  dom.challengeCompleteFact = document.getElementById('hub-challenge-complete-fact');
+  dom.challengeRestartBtn = document.getElementById('hub-challenge-restart-btn');
+  dom.challengeNextBtn = document.getElementById('hub-challenge-next-btn');
+
+  dom.challengeSidebarObjective = document.getElementById('hub-challenge-sidebar-objective');
+  dom.challengeReferences = document.getElementById('hub-challenge-references');
+
   // Codex & Achievements
   dom.codexCounter = document.getElementById('hub-codex-counter');
   dom.codexGrid = document.getElementById('hub-codex-grid');
+  dom.openGaleDossierBtn = document.getElementById('hub-open-gale-dossier-btn');
+  dom.galeModal = document.getElementById('hub-gale-modal');
+  dom.galeModalCloseBtn = document.getElementById('hub-gale-modal-close-btn');
+  dom.galeStepper = document.getElementById('hub-gale-stepper');
+  dom.galePhaseContent = document.getElementById('hub-gale-phase-content');
+  dom.galePrevBtn = document.getElementById('hub-gale-prev-btn');
+  dom.galeNextBtn = document.getElementById('hub-gale-next-btn');
+  dom.galePhaseIndicator = document.getElementById('hub-gale-phase-indicator');
+  dom.nasaSourcesGrid = document.getElementById('hub-nasa-sources-grid');
   dom.achievementsCounter = document.getElementById('hub-achievements-counter');
   dom.achievementsGrid = document.getElementById('hub-achievements-grid');
 
@@ -1849,6 +2692,33 @@ function bindEvents() {
     });
   }
 
+  if (dom.homeRoverPrevBtn) {
+    dom.homeRoverPrevBtn.addEventListener('click', () => {
+      cycleHomeRover(-1);
+    });
+  }
+
+  if (dom.homeRoverNextBtn) {
+    dom.homeRoverNextBtn.addEventListener('click', () => {
+      cycleHomeRover(1);
+    });
+  }
+
+  if (dom.homeRoverPills) {
+    dom.homeRoverPills.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-rover-id]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-rover-id');
+      if (id) selectHomeRobotById(id);
+    });
+  }
+
+  if (dom.homeGotoGarageBtn) {
+    dom.homeGotoGarageBtn.addEventListener('click', () => {
+      showScreen('garage');
+    });
+  }
+
   if (dom.missionStartBtn) {
     dom.missionStartBtn.addEventListener('click', () => {
       launchMission(state.selectedMissionId);
@@ -1911,6 +2781,60 @@ function bindEvents() {
       playIntroVideo(() => {
         showHub('settings');
       });
+    });
+  }
+
+  if (dom.openGaleDossierBtn) {
+    dom.openGaleDossierBtn.addEventListener('click', () => {
+      openGaleModal(0);
+    });
+  }
+
+  if (dom.galeModalCloseBtn) {
+    dom.galeModalCloseBtn.addEventListener('click', () => {
+      closeGaleModal();
+    });
+  }
+
+  if (dom.galeModal) {
+    dom.galeModal.addEventListener('click', (e) => {
+      if (e.target === dom.galeModal) {
+        closeGaleModal();
+      }
+    });
+  }
+
+  if (dom.galePrevBtn) {
+    dom.galePrevBtn.addEventListener('click', () => {
+      setGalePhase(state.galePhaseIndex - 1);
+    });
+  }
+
+  if (dom.galeNextBtn) {
+    dom.galeNextBtn.addEventListener('click', () => {
+      if (state.galePhaseIndex >= GALE_CRATER_CHRONICLE.length - 1) {
+        closeGaleModal();
+      } else {
+        setGalePhase(state.galePhaseIndex + 1);
+      }
+    });
+  }
+
+  if (dom.galeStepper) {
+    dom.galeStepper.addEventListener('click', (e) => {
+      const stepBtn = e.target.closest('[data-phase-idx]');
+      if (!stepBtn) return;
+      const idx = parseInt(stepBtn.getAttribute('data-phase-idx'), 10);
+      if (!Number.isNaN(idx)) setGalePhase(idx);
+    });
+  }
+
+  if (dom.codexGrid) {
+    dom.codexGrid.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-open-gale]');
+      if (target) {
+        openGaleModal(0);
+      }
     });
   }
 
@@ -2012,7 +2936,7 @@ function bindEvents() {
 
   if (dom.introOverlay) {
     dom.introOverlay.addEventListener('click', (e) => {
-      if (state.introWaitingForKey && e.target !== dom.introMuteBtn) {
+      if (state.introWaitingForKey && !dom.introMuteBtn?.contains(e.target)) {
         finishIntroVideo();
       }
     });
@@ -2039,6 +2963,58 @@ function bindEvents() {
     dom.introMuteBtn.addEventListener('click', () => {
       dom.introVideo.muted = !dom.introVideo.muted;
       updateIntroMuteButton();
+    });
+  }
+
+  // Analog Challenges Event Bindings
+  if (dom.challengeNav) {
+    dom.challengeNav.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-challenge-key]');
+      if (btn) {
+        const key = btn.getAttribute('data-challenge-key');
+        if (key) switchChallenge(key);
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const gotoBtn = e.target.closest('[data-challenge-goto]');
+    if (gotoBtn) {
+      const step = gotoBtn.getAttribute('data-challenge-goto');
+      if (step) setChallengeStep(step);
+    }
+  });
+
+  if (dom.challengeCandidateGrid) {
+    dom.challengeCandidateGrid.addEventListener('click', (e) => {
+      const card = e.target.closest('.hub-challenge-candidate-card');
+      if (card) {
+        const candId = card.getAttribute('data-candidate-id');
+        if (candId) selectChallengeCandidate(candId);
+      }
+    });
+  }
+
+  if (dom.challengeHintBtn) {
+    dom.challengeHintBtn.addEventListener('click', () => {
+      if (dom.challengeHintBox) {
+        dom.challengeHintBox.hidden = !dom.challengeHintBox.hidden;
+      }
+    });
+  }
+
+  if (dom.challengeSubmitBtn) {
+    dom.challengeSubmitBtn.addEventListener('click', submitChallengeAnswer);
+  }
+
+  if (dom.challengeRestartBtn) {
+    dom.challengeRestartBtn.addEventListener('click', () => switchChallenge(state.challengeKey));
+  }
+
+  if (dom.challengeNextBtn) {
+    dom.challengeNextBtn.addEventListener('click', () => {
+      const nextKey = dom.challengeNextBtn.getAttribute('data-next-key') || 'terrain';
+      switchChallenge(nextKey);
     });
   }
 }
