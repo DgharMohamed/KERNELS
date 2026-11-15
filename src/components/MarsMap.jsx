@@ -136,6 +136,21 @@ export default function MarsMap({ places, selectedId, onSelect, onViewDetails })
         <span>Mars · NASA Mars Trek</span>
       </div>
 
+      <aside className="map-legend" aria-label="Map legend">
+        <p className="map-legend__title">Elevation</p>
+        <div className="map-legend__bar" aria-hidden="true" />
+        <div className="map-legend__ticks">
+          <span>−8 km</span>
+          <span>0</span>
+          <span>+12 km</span>
+        </div>
+        <p className="map-legend__caption">Lowlands → Highlands</p>
+        <div className="map-legend__row">
+          <span className="map-legend__marker" aria-hidden="true" />
+          <span>Featured site</span>
+        </div>
+      </aside>
+
       <button
         type="button"
         className="map-reset"
