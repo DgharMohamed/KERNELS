@@ -50,6 +50,7 @@ operation-red-rock/
 ├── hub.css                     # Mission control UI styles
 ├── INTEGRATION.md              # Game engine integration interface
 ├── Ressources_Documentation.md # Comprehensive documentation of NASA datasets & maps
+├── ../Super_Intelligence_Tools_Documentation.md # Super Intelligence tools used for programming and media generation
 └── package.json                # Dependencies and build scripts
 ```
 

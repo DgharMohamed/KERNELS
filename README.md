@@ -6,6 +6,7 @@ An educational web app that helps people learn how to identify Earth locations t
 
 - **operation-red-rock/**: Main web application, mission hub, and simulation canvas (Vite, React 19, TypeScript, Three.js 3D engine, Canvas).
 - **Ressources_Documentation.md**: Detailed scientific documentation of all NASA datasets, DEMs, satellite imagery, telemetry, and research literature.
+- **Super_Intelligence_Tools_Documentation.md**: Super Intelligence tools used for programming assistance and audio/video generation.
 - **Car-Sounds/**: Vehicle audio and engine startup sound assets.
 - **Robot-Sounds/**: Rover mechanical movement and robotics sound assets.
 - **Wind-Sounds/**: Ambient Martian wind and atmospheric sound assets.
