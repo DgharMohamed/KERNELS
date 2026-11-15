@@ -1,0 +1,151 @@
+[gd_scene load_steps=5 format=3 uid="uid://sc13nc3_d3br13f"]
+
+[ext_resource type="Script" path="res://scripts/science_debrief_modal.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main"]
+bg_color = Color(0.06, 0.08, 0.11, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.5, 0.75, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_left = 10
+corner_radius_bottom_right = 10
+content_margin_left = 28.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 22.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_verdict"]
+bg_color = Color(0.08, 0.18, 0.12, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.8, 0.4, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[node name="ScienceDebriefModal" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.04, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(980, 620)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_main")
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="Label" parent="CenterContainer/Panel/VBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "★ NASA PDS SCIENCE REPORT: SAMPLE RETRIEVED ★"
+horizontal_alignment = 1
+
+[node name="SubHeader" type="Label" parent="CenterContainer/Panel/VBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.86, 0.92, 1)
+theme_override_font_sizes/font_size = 14
+text = "Curiosity CheMin X-Ray Diffraction & ChemCam Mineral Analysis"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="MetaBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TargetLabel" type="Label" parent="CenterContainer/Panel/VBox/MetaBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "TARGET: John Klein Mudstone Outcrop (Yellowknife Bay)"
+
+[node name="FormationLabel" type="Label" parent="CenterContainer/Panel/VBox/MetaBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+text = "GEOLOGICAL UNIT: Sheepbed Member / Ancient Lacustrine Mudstone"
+
+[node name="InstrumentsLabel" type="Label" parent="CenterContainer/Panel/VBox/MetaBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.82, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "INSTRUMENTS: CheMin XRD, APXS Alpha Particle Spectrometer"
+
+[node name="MineralsPanel" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="CenterContainer/Panel/VBox/MineralsPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+theme_override_font_sizes/font_size = 16
+text = "MINERALOGICAL SPECTROSCOPY (NASA CheMin Dataset):"
+
+[node name="Grid" type="VBoxContainer" parent="CenterContainer/Panel/VBox/MineralsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="VerdictPanel" type="PanelContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_verdict")
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox/VerdictPanel"]
+layout_mode = 2
+
+[node name="VerdictLabel" type="Label" parent="CenterContainer/Panel/VBox/VerdictPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 1, 0.55, 1)
+theme_override_font_sizes/font_size = 15
+text = "✔ HABITABLE PALEOENVIRONMENT CONFIRMED: Evidence of an ancient freshwater lake bed capable of supporting microbial life."
+autowrap_mode = 2
+
+[node name="CloseBtn" type="Button" parent="CenterContainer/Panel/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "PROCEED TO MISSION COMPLETE"

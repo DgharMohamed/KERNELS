@@ -1,0 +1,360 @@
+[gd_scene load_steps=12 format=3 uid="uid://eo30kruldshw"]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_ahhtf"]
+[ext_resource type="Script" path="res://scripts/compass_ribbon.gd" id="2_compass"]
+[ext_resource type="PackedScene" path="res://scenes/mission_select_modal.tscn" id="3_mission_modal"]
+[ext_resource type="PackedScene" path="res://scenes/vehicle_select_modal.tscn" id="4_vehicle_modal"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu_modal.tscn" id="5_pause_modal"]
+[ext_resource type="PackedScene" path="res://scenes/science_debrief_modal.tscn" id="6_science_modal"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_telemetry"]
+bg_color = Color(0.06, 0.08, 0.12, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.55, 0.8, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quest"]
+bg_color = Color(0.06, 0.08, 0.12, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 0.45, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_battery"]
+bg_color = Color(0.06, 0.08, 0.12, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.65, 0.9, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_collect_prompt"]
+bg_color = Color(0.06, 0.08, 0.12, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.95, 0.5, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_left = 10
+corner_radius_bottom_right = 10
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_key_box"]
+bg_color = Color(0.15, 0.2, 0.28, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.85, 0.6, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_ahhtf")
+
+[node name="TopLeft" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 310.0
+offset_bottom = 225.0
+
+[node name="Panel" type="PanelContainer" parent="TopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_telemetry")
+
+[node name="VBox" type="VBoxContainer" parent="TopLeft/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Header" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "◆ GALE CRATER REMS TELEMETRY"
+
+[node name="HSep" type="HSeparator" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SPEED: 0.0 m/s"
+
+[node name="SlopeLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SLOPE: +0.0°"
+
+[node name="ElevationLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "ELEV: 0.0 m"
+
+[node name="WindLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "WIND SPEED: 3.8 m/s (ESE)"
+
+[node name="TempLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "SURFACE TEMP: -14°C / -72°C"
+
+[node name="PressureLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.92, 1)
+theme_override_font_sizes/font_size = 13
+text = "PRESSURE: 812 Pa (0.8% Earth)"
+
+[node name="WeatherLabel" type="Label" parent="TopLeft/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 1, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "WEATHER: Clear (No Storm / No Snow)"
+
+[node name="TopCenter" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -180.0
+offset_top = 18.0
+offset_right = 180.0
+offset_bottom = 58.0
+grow_horizontal = 2
+
+[node name="CompassRibbon" type="Control" parent="TopCenter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_compass")
+
+[node name="TopRight" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 145.0
+grow_horizontal = 0
+
+[node name="QuestPanel" type="PanelContainer" parent="TopRight"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 76.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_quest")
+
+[node name="VBox" type="VBoxContainer" parent="TopRight/QuestPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="QuestHeader" type="HBoxContainer" parent="TopRight/QuestPanel/VBox"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="TopRight/QuestPanel/VBox/QuestHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 1, 0.55, 1)
+theme_override_font_sizes/font_size = 15
+text = "🎯"
+
+[node name="Title" type="Label" parent="TopRight/QuestPanel/VBox/QuestHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "MUDSTONE OUTCROP"
+
+[node name="DistLabel" type="Label" parent="TopRight/QuestPanel/VBox/QuestHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+theme_override_font_sizes/font_size = 14
+text = "[70m]"
+
+[node name="QuestBar" type="ProgressBar" parent="TopRight/QuestPanel/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+value = 25.0
+show_percentage = false
+
+[node name="MenuButton" type="Button" parent="TopRight"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 14
+text = "☰ MENU [ESC]"
+
+[node name="BottomRight" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -290.0
+offset_top = -76.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="BatteryPanel" type="PanelContainer" parent="BottomRight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_battery")
+
+[node name="VBox" type="VBoxContainer" parent="BottomRight/BatteryPanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="BottomRight/BatteryPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="Label" parent="BottomRight/BatteryPanel/VBox/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 17
+text = "⚡"
+
+[node name="BatteryBar" type="ProgressBar" parent="BottomRight/BatteryPanel/VBox/HBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 100.0
+show_percentage = false
+
+[node name="PctLabel" type="Label" parent="BottomRight/BatteryPanel/VBox/HBox"]
+custom_minimum_size = Vector2(46, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "100%"
+horizontal_alignment = 2
+
+[node name="CenterPrompt" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = 40.0
+offset_right = 160.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+
+[node name="PromptPanel" type="PanelContainer" parent="CenterPrompt"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_collect_prompt")
+
+[node name="HBox" type="HBoxContainer" parent="CenterPrompt/PromptPanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="CollectLabel" type="Label" parent="CenterPrompt/PromptPanel/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "COLLECT SAMPLE"
+
+[node name="KeyBox" type="PanelContainer" parent="CenterPrompt/PromptPanel/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_key_box")
+
+[node name="KeyLabel" type="Label" parent="CenterPrompt/PromptPanel/HBox/KeyBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "E"
+horizontal_alignment = 1
+
+[node name="DrillLabel" type="Label" parent="CenterPrompt/PromptPanel/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = ""
+visible = false
+
+[node name="MissionSelectModal" parent="." instance=ExtResource("3_mission_modal")]
+
+[node name="VehicleSelectModal" parent="." instance=ExtResource("4_vehicle_modal")]
+
+[node name="PauseMenuModal" parent="." instance=ExtResource("5_pause_modal")]
+
+[node name="ScienceDebriefModal" parent="." instance=ExtResource("6_science_modal")]

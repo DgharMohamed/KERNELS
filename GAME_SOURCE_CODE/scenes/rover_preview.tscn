@@ -1,0 +1,115 @@
+[gd_scene load_steps=13 format=3 uid="uid://b8preview_rover"]
+
+[ext_resource type="Script" path="res://scripts/rover_preview.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.47, 0.53, 0.43, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_top"]
+albedo_color = Color(0.78, 0.66, 0.39, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chassis"]
+albedo_color = Color(0.2, 0.23, 0.22, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wheel"]
+albedo_color = Color(0.12, 0.13, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sensor"]
+albedo_color = Color(0.32, 0.56, 0.62, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+size = Vector3(1.7, 0.58, 2.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+material = SubResource("StandardMaterial3D_top")
+size = Vector3(1.8, 0.12, 2.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_chassis"]
+material = SubResource("StandardMaterial3D_chassis")
+size = Vector3(2.0, 0.2, 2.45)
+
+[sub_resource type="BoxMesh" id="BoxMesh_equipment"]
+material = SubResource("StandardMaterial3D_top")
+size = Vector3(0.68, 0.22, 0.62)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
+material = SubResource("StandardMaterial3D_wheel")
+top_radius = 0.2625
+bottom_radius = 0.2625
+height = 0.22
+radial_segments = 10
+
+[sub_resource type="BoxMesh" id="BoxMesh_camera"]
+material = SubResource("StandardMaterial3D_sensor")
+size = Vector3(0.38, 0.22, 0.32)
+
+[node name="RoverPreview" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 2.2, 2.0, 3.4)
+fov = 40.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 4, 0)
+light_color = Color(1, 0.96, 0.9, 1)
+light_energy = 1.6
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.707107, 0.5, -0.5, 0, 0.707107, 0.707107, 0.707107, 0.5, -0.5, 0, 2, 0)
+light_color = Color(0.4, 0.6, 0.8, 1)
+light_energy = 0.8
+
+[node name="Visuals" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="Chassis" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.01, 0)
+mesh = SubResource("BoxMesh_chassis")
+
+[node name="Body" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.41, 0)
+mesh = SubResource("BoxMesh_body")
+
+[node name="EquipmentDeck" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.76, 0)
+mesh = SubResource("BoxMesh_deck")
+
+[node name="EquipmentModule" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.93, 0.42)
+mesh = SubResource("BoxMesh_equipment")
+
+[node name="Sensor" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.39, -0.5)
+mesh = SubResource("BoxMesh_camera")
+
+[node name="WheelFrontLeft" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-1.24, -0.4375, -1.2)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelFrontRight" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(1.24, -0.4375, -1.2)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelCenterLeft" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-1.24, -0.4375, 0)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelCenterRight" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(1.24, -0.4375, 0)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelRearLeft" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-1.24, -0.4375, 1.2)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelRearRight" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(1.24, -0.4375, 1.2)
+rotation = Vector3(0, 0, 1.5708)
+mesh = SubResource("CylinderMesh_wheel")

@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://noiuej8a7ogw"]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_rover"]
+[ext_resource type="PackedScene" uid="uid://eo30kruldshw" path="res://scenes/hud.tscn" id="2_hud"]
+[ext_resource type="Script" uid="uid://wq54jpypcm46" path="res://scripts/terrain_map.gd" id="3_terrain"]
+[ext_resource type="PackedScene" uid="uid://echjc2nw4s2w" path="res://assets/gale_crater.glb" id="4_crater"]
+[ext_resource type="PackedScene" path="res://scenes/rock_field.tscn" id="6_rock_field"]
+[ext_resource type="PackedScene" path="res://scenes/sample_site.tscn" id="7_sample_site"]
+[ext_resource type="Script" uid="uid://0d2fi44cn6hk" path="res://scripts/dust_storm.gd" id="8_dust_storm"]
+
+[sub_resource type="Environment" id="Environment_training"]
+background_mode = 1
+background_color = Color(0.76, 0.62, 0.42, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.82, 0.76, 0.65, 1)
+ambient_light_energy = 0.55
+fog_enabled = true
+fog_light_color = Color(0.76, 0.62, 0.42, 1)
+fog_density = 0.008
+fog_depth_begin = 200.0
+fog_depth_end = 800.0
+
+[node name="Main" type="Node3D" unique_id=466351580]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1508232359]
+environment = SubResource("Environment_training")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=957429837]
+transform = Transform3D(0.90630776, -0.3140666, 0.2827868, 0, 0.66913056, 0.74314487, -0.42261827, -0.67351794, 0.6064382, 0, 0, 0)
+light_color = Color(1, 0.94, 0.8, 1)
+light_energy = 1.2
+
+[node name="Terrain" type="StaticBody3D" parent="." unique_id=1760917685]
+script = ExtResource("3_terrain")
+
+[node name="GaleCrater" parent="Terrain" unique_id=1803360893 instance=ExtResource("4_crater")]
+transform = Transform3D(1469.32, 0, 0, 0, 1469.32, 0, 0, 0, 1469.32, 0, -5586.4, 0)
+
+[node name="Rover" parent="." unique_id=1893114215 instance=ExtResource("1_rover")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+
+[node name="RockField" parent="." unique_id=1597874889 instance=ExtResource("6_rock_field")]
+
+[node name="SampleSite" parent="." groups=["sample_site"] instance=ExtResource("7_sample_site")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -45)
+
+[node name="HUD" parent="." unique_id=1523409522 instance=ExtResource("2_hud")]
+
+[node name="DustStorm" type="Node3D" parent="." unique_id=311071406]
+script = ExtResource("8_dust_storm")

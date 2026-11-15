@@ -1,0 +1,13 @@
+# Godot 4+ specific ignores
+.godot/
+*.translation
+
+# OS and Editor junk
+.DS_Store
+Thumbs.db
+*.tmp
+
+# AI / IDE Agent workspaces (keep repository clean)
+.agent/
+addons/
+*.stl
