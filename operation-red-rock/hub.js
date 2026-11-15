@@ -360,6 +360,9 @@ function playIntroVideo(onComplete) {
   state.introWaitingForKey = false;
   state.introDoneCallback = typeof onComplete === 'function' ? onComplete : null;
 
+  if (dom.introEndcard) {
+    dom.introEndcard.hidden = true;
+  }
   if (dom.introControls) {
     dom.introControls.hidden = false;
   }
@@ -396,6 +399,14 @@ function handleIntroEnded() {
   if (dom.introControls) {
     dom.introControls.hidden = true;
   }
+  if (dom.introEndcard) {
+    dom.introEndcard.hidden = false;
+    if (dom.introStartBtn) {
+      try {
+        dom.introStartBtn.focus();
+      } catch (_) {}
+    }
+  }
 }
 
 function finishIntroVideo() {
@@ -403,6 +414,9 @@ function finishIntroVideo() {
   state.introPlaying = false;
   state.introWaitingForKey = false;
 
+  if (dom.introEndcard) {
+    dom.introEndcard.hidden = true;
+  }
   if (dom.introControls) {
     dom.introControls.hidden = false;
   }
@@ -2669,6 +2683,9 @@ function cacheDom() {
   dom.introControls = document.getElementById('hub-intro-controls');
   dom.introMuteBtn = document.getElementById('hub-intro-mute-btn');
   dom.introSkipBtn = document.getElementById('hub-intro-skip-btn');
+  dom.introEndcard = document.getElementById('hub-intro-endcard');
+  dom.introStartBtn = document.getElementById('hub-intro-start-btn');
+  dom.introReplayBtn = document.getElementById('hub-intro-replay-btn');
 
   // 3D robot viewport
   dom.robotViewport = document.getElementById('hub-robot-viewport');
@@ -2952,9 +2969,30 @@ function bindEvents() {
 
   if (dom.introOverlay) {
     dom.introOverlay.addEventListener('click', (e) => {
-      if (state.introWaitingForKey && !dom.introMuteBtn?.contains(e.target)) {
+      if (dom.introReplayBtn && dom.introReplayBtn.contains(e.target)) return;
+      if (dom.introMuteBtn && dom.introMuteBtn.contains(e.target)) return;
+      if (state.introWaitingForKey) {
         finishIntroVideo();
       }
+    });
+  }
+
+  if (dom.introStartBtn) {
+    dom.introStartBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      finishIntroVideo();
+    });
+  }
+
+  if (dom.introReplayBtn) {
+    dom.introReplayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!dom.introVideo) return;
+      if (dom.introEndcard) dom.introEndcard.hidden = true;
+      if (dom.introControls) dom.introControls.hidden = false;
+      state.introWaitingForKey = false;
+      dom.introVideo.currentTime = 0;
+      dom.introVideo.play().catch(() => {});
     });
   }
 
@@ -3108,6 +3146,7 @@ const Hub = {
     state.introWaitingForKey = false;
     state.introDoneCallback = null;
     if (dom.introControls) dom.introControls.hidden = false;
+    if (dom.introEndcard) dom.introEndcard.hidden = true;
     if (dom.introVideo) {
       dom.introVideo.pause();
       dom.introVideo.removeAttribute('src');
