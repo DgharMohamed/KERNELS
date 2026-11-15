@@ -37,7 +37,6 @@ a {
 
 .interactive-map-root {
   position: relative;
-  overflow: clip;
   border-radius: 10px;
   background: #07070C;
 }
@@ -48,10 +47,13 @@ a {
 
 .interactive-map-root .app-shell {
   min-height: 0;
+  overflow: visible;
 }
 
 .interactive-map-root .app-header {
-  position: static;
+  position: sticky;
+  top: 65px;
+  z-index: 90;
 }
 
 .interactive-map-root .starfield {
@@ -59,8 +61,8 @@ a {
 }
 
 .interactive-map-root .explorer-sidebar {
-  top: 80px;
-  max-height: calc(100vh - 96px);
+  top: 146px;
+  max-height: calc(100vh - 162px);
 }
 
 .interactive-map-root .app-footer {
