@@ -37,7 +37,6 @@ export default function App() {
       </div>
 
       <footer className="app-footer">
-        <span>Mars &amp; Earth Explorer · Educational MVP</span>
         <span>
           Data: IAU/USGS Gazetteer · NASA Science ·{' '}
           <a href="https://trek.nasa.gov/mars/" target="_blank" rel="noreferrer noopener">
