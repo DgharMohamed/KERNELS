@@ -325,12 +325,11 @@ function emitSettingsChange() {
 }
 
 function launchMission(missionId) {
-  if (state.progress < 100) return;
-  if (getMissionStatus(missionId) === 'locked') return;
-  const robotId = state.selectedRobotId;
+  const robotId = state.selectedRobotId || 'explorer';
+  const mid = missionId || 'gale_plains';
   playIntroVideo(() => {
     if (typeof state.callbacks.onLaunch === 'function') {
-      state.callbacks.onLaunch({ missionId, robotId });
+      state.callbacks.onLaunch({ missionId: mid, robotId });
     }
   });
 }
@@ -468,9 +467,7 @@ function getRecommendedMission() {
 function getTargetScreenFromHash() {
   const hash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
   if (hash === 'challenges' || hash === 'learning') return 'challenges';
-  if (hash === 'garage' || hash === 'rovers' || hash === 'rover') return 'garage';
-  if (hash === 'missions') return 'missions';
-  if (hash === 'codex') return 'codex';
+  if (hash === 'codex' || hash === 'articles') return 'codex';
   if (hash === 'settings') return 'settings';
   return 'home';
 }
@@ -734,13 +731,11 @@ function drawStarfield(dt) {
 }
 
 function updateHomeLaunchAvailability() {
-  const ready = state.progress >= 100;
   if (dom.launchBtn) {
-    dom.launchBtn.disabled = !ready;
+    dom.launchBtn.disabled = false;
   }
   if (dom.homeLaunchHint) {
-    dom.homeLaunchHint.hidden = ready;
-    dom.homeLaunchHint.textContent = HUB_COPY.home.launchLockedHint;
+    dom.homeLaunchHint.hidden = true;
   }
 }
 
@@ -1530,6 +1525,8 @@ const CHALLENGE_STEP_META = {
   complete: ['MISSION DEBRIEF · CHALLENGE COMPLETED', '100%'],
 };
 
+const CHALLENGE_ORDER = ['terrain', 'climate', 'geology', 'temperature', 'atmospheric', 'surface', 'global'];
+
 function getChallengeStatus(key) {
   const completed = Array.isArray(state.playerData.completedChallenges)
     ? state.playerData.completedChallenges
@@ -1539,23 +1536,19 @@ function getChallengeStatus(key) {
     return 'completed';
   }
 
-  if (key === 'terrain') {
-    return 'unlocked';
-  }
-  if (key === 'climate') {
-    return completed.includes('terrain') ? 'unlocked' : 'locked';
-  }
-  if (key === 'global') {
-    return completed.includes('climate') ? 'unlocked' : 'locked';
-  }
-
-  return 'locked';
+  if (key === 'terrain') return 'unlocked';
+  const idx = CHALLENGE_ORDER.indexOf(key);
+  if (idx <= 0) return 'locked';
+  const prev = CHALLENGE_ORDER[idx - 1];
+  return completed.includes(prev) ? 'unlocked' : 'locked';
 }
 
 function getChallengePrereqName(key) {
-  if (key === 'climate') return '01 Terrain Morphology';
-  if (key === 'global') return '02 Climate & REMS';
-  return '';
+  const idx = CHALLENGE_ORDER.indexOf(key);
+  if (idx <= 0) return '';
+  const prevKey = CHALLENGE_ORDER[idx - 1];
+  const prevChallenge = ANALOG_CHALLENGES[prevKey];
+  return prevChallenge ? `${prevChallenge.number} ${prevChallenge.name}` : '';
 }
 
 function switchChallenge(key) {
@@ -1663,7 +1656,7 @@ function renderMarsBaselineHtml(baseline) {
 function renderChallengesScreen() {
   // If active challenge is locked, fallback to the latest unlocked one
   if (getChallengeStatus(state.challengeKey) === 'locked') {
-    const keys = ['terrain', 'climate', 'global'];
+    const keys = CHALLENGE_ORDER;
     const unlocked = keys.filter((k) => getChallengeStatus(k) !== 'locked');
     state.challengeKey = unlocked[unlocked.length - 1] || 'terrain';
   }
@@ -1675,11 +1668,11 @@ function renderChallengesScreen() {
     ? state.playerData.completedChallenges
     : [];
   const completedCount = completedList.length;
-  const pct = Math.round((completedCount / 3) * 100);
+  const pct = Math.round((completedCount / CHALLENGE_ORDER.length) * 100);
 
   // Update Top Counter & Rail Progress Card
   if (dom.challengeCounter) {
-    dom.challengeCounter.textContent = `${completedCount} / 3 Mastered`;
+    dom.challengeCounter.textContent = `${completedCount} / ${CHALLENGE_ORDER.length} Mastered`;
   }
   if (dom.challengeRailPercent) {
     dom.challengeRailPercent.textContent = `${pct}%`;
@@ -1688,14 +1681,14 @@ function renderChallengesScreen() {
     dom.challengeRailBar.style.width = `${pct}%`;
   }
   if (dom.challengeRailFeedback && !dom.challengeRailFeedback.classList.contains('is-alert')) {
-    dom.challengeRailFeedback.textContent = completedCount === 3
-      ? 'All 3 analog challenges completed! Excellent research work.'
-      : `${completedCount} of 3 sectors mastered. Solve active sector to advance.`;
+    dom.challengeRailFeedback.textContent = completedCount === CHALLENGE_ORDER.length
+      ? `All ${CHALLENGE_ORDER.length} analog challenges completed! Excellent research work.`
+      : `${completedCount} of ${CHALLENGE_ORDER.length} sectors mastered. Solve active sector to advance.`;
   }
 
   // Render Challenge Rail Items (Ladder Cards)
   if (dom.challengeNav) {
-    const challengeKeys = ['terrain', 'climate', 'global'];
+    const challengeKeys = CHALLENGE_ORDER;
     dom.challengeNav.innerHTML = challengeKeys.map((key) => {
       const c = ANALOG_CHALLENGES[key];
       const status = getChallengeStatus(key);
@@ -2039,8 +2032,12 @@ function renderChallengesScreen() {
       dom.challengeCompleteFact.innerHTML = `<strong>Scientific Synthesis:</strong> ${escapeHtml(challenge.takeaway)}`;
     }
     if (dom.challengeNextBtn) {
-      const nextKey = state.challengeKey === 'terrain' ? 'climate' : state.challengeKey === 'climate' ? 'global' : 'terrain';
-      const nextLabel = state.challengeKey === 'terrain' ? 'Next: Climate & REMS →' : state.challengeKey === 'climate' ? 'Next: Global Analog Strategy →' : 'Back to Terrain Challenge';
+      const idx = CHALLENGE_ORDER.indexOf(state.challengeKey);
+      const nextKey = idx >= 0 && idx < CHALLENGE_ORDER.length - 1 ? CHALLENGE_ORDER[idx + 1] : CHALLENGE_ORDER[0];
+      const nextChallenge = ANALOG_CHALLENGES[nextKey];
+      const nextLabel = idx >= 0 && idx < CHALLENGE_ORDER.length - 1
+        ? `Next: ${nextChallenge ? nextChallenge.name : 'Next Challenge'} →`
+        : 'Back to Terrain Challenge';
       dom.challengeNextBtn.textContent = nextLabel;
       dom.challengeNextBtn.setAttribute('data-next-key', nextKey);
     }

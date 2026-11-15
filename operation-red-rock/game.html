@@ -274,23 +274,25 @@
     <div id="mission-hub" class="hub-root" data-hub-visible="true" data-screen="loading" aria-label="Mission Hub">
       <canvas id="hub-starfield" class="hub-starfield" aria-hidden="true"></canvas>
 
-      <!-- Top Navigation (Desktop) / Bottom Navigation (Mobile) -->
+      <!-- Top Navigation (Header) -->
       <header id="hub-nav-bar" class="hub-nav-bar" hidden>
         <div class="hub-nav-inner">
-          <a href="./index.html" class="hub-brand" style="text-decoration:none;" title="Back to Home Page">OPERATION RED ROCK</a>
-          <nav class="hub-tabs" role="tablist" aria-label="Mission Hub Sections">
-            <a href="./index.html" style="text-decoration:none; display:inline-flex; align-items:center; padding: 6px 12px; font-size:12px; font-weight:600; color:#8A90A2; border:1px solid #26304D; border-radius:4px; background:#141A2E;" title="Return to Home Page">← Home Page</a>
-            <button type="button" class="hub-tab" role="tab" id="hub-tab-home" data-screen-target="home" aria-selected="true" aria-controls="hub-screen-home">Home</button>
-            <button type="button" class="hub-tab" role="tab" id="hub-tab-garage" data-screen-target="garage" aria-selected="false" aria-controls="hub-screen-garage">Garage</button>
-            <button type="button" class="hub-tab" role="tab" id="hub-tab-missions" data-screen-target="missions" aria-selected="false" aria-controls="hub-screen-missions">Missions</button>
+          <a href="./index.html" class="hub-brand" title="Back to Home Page">
+            <span class="hub-brand-dot" aria-hidden="true"></span>
+            <span class="hub-brand-text">OPERATION RED ROCK</span>
+          </a>
+          <nav class="hub-tabs" role="tablist" aria-label="Main Navigation">
+            <a href="./index.html" class="hub-tab" id="hub-tab-main-home" title="Open Main Website">Home</a>
             <button type="button" class="hub-tab" role="tab" id="hub-tab-challenges" data-screen-target="challenges" aria-selected="false" aria-controls="hub-screen-challenges">Challenges</button>
-            <button type="button" class="hub-tab" role="tab" id="hub-tab-codex" data-screen-target="codex" aria-selected="false" aria-controls="hub-screen-codex">Codex</button>
-            <button type="button" class="hub-tab" role="tab" id="hub-tab-settings" data-screen-target="settings" aria-selected="false" aria-controls="hub-screen-settings">Settings</button>
+            <button type="button" class="hub-tab hub-tab-text" role="tab" id="hub-tab-codex" data-screen-target="codex" aria-selected="false" aria-controls="hub-screen-codex">Articles</button>
+            <button type="button" class="hub-tab hub-nav-game-btn" role="tab" id="hub-tab-home" data-screen-target="home" aria-selected="true" aria-controls="hub-screen-home" title="Game Home Page">GAME</button>
+            <button type="button" class="hub-tab hub-tab-settings-icon" role="tab" id="hub-tab-settings" data-screen-target="settings" aria-selected="false" aria-controls="hub-screen-settings" title="Settings" aria-label="Settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
           </nav>
-          <div class="hub-nav-callsign">
-            <span class="hub-muted-label">Callsign</span>
-            <span id="hub-nav-callsign-value" class="hub-mono-value">ROVER01</span>
-          </div>
         </div>
       </header>
 
@@ -320,51 +322,24 @@
         <section id="hub-screen-home" class="hub-screen" data-screen-name="home" role="tabpanel" aria-labelledby="hub-tab-home" hidden>
           <div class="hub-home-layout">
             <div class="hub-home-preview-col">
-              <!-- Rover Style Switcher -->
-              <div class="hub-home-rover-switcher" aria-label="Rover Selection">
-                <button type="button" id="hub-home-rover-prev" class="hub-home-switcher-btn" aria-label="Previous Rover" title="Previous Rover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                  </svg>
-                </button>
-                <div class="hub-home-rover-badge">
-                  <span id="hub-home-rover-name" class="hub-home-rover-title">Explorer</span>
-                  <span id="hub-home-rover-role" class="hub-home-rover-subtitle">All-Terrain Science Rover</span>
-                </div>
-                <button type="button" id="hub-home-rover-next" class="hub-home-switcher-btn" aria-label="Next Rover" title="Next Rover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </button>
+              <!-- Single Rover Identity Badge -->
+              <div class="hub-home-rover-badge-fixed" aria-label="Assigned Rover">
+                <span id="hub-home-rover-name" class="hub-home-rover-title">Explorer</span>
+                <span id="hub-home-rover-role" class="hub-home-rover-subtitle">All-Terrain Science Rover</span>
               </div>
 
-              <!-- 3D Preview Slot -->
+              <!-- 3D Rotating Preview Slot -->
               <div id="hub-home-preview-slot" class="hub-preview-slot"></div>
 
-              <!-- Quick Chassis Style Selector Pills -->
-              <div id="hub-home-rover-pills" class="hub-home-rover-pills" role="radiogroup" aria-label="Select Rover Style"></div>
-
-              <p class="hub-preview-caption" id="hub-home-preview-hint">Drag to rotate rover</p>
-
-              <!-- Garage More Info Notice Card -->
-              <div class="hub-home-garage-card">
-                <div class="hub-home-garage-card-inner">
-                  <div class="hub-home-garage-card-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                    </svg>
-                  </div>
-                  <div class="hub-home-garage-card-text">
-                    <span class="hub-home-garage-card-title">Need more details or upgrades?</span>
-                    <span class="hub-home-garage-card-desc">Check telemetry, performance stats &amp; workshop hardware in the Garage.</span>
-                  </div>
-                </div>
-                <button type="button" id="hub-home-goto-garage-btn" class="hub-btn hub-btn-secondary hub-btn-sm">Go to Garage →</button>
-              </div>
+              <p class="hub-preview-caption" id="hub-home-preview-hint">Explorer &middot; Rotating 3D Rover (Drag to inspect)</p>
             </div>
             <div class="hub-home-info-col">
-              <p class="hub-kicker" id="hub-home-subtitle">Planetary Rover Training &amp; Mars Sample Retrieval</p>
+              <p class="hub-kicker" id="hub-home-subtitle">Planetary Rover Simulation</p>
               <h1 class="hub-hero-title" id="hub-home-title">OPERATION RED ROCK</h1>
+              <p class="hub-home-desc">
+                Deploy the Explorer rover onto the Martian terrain of Gale Crater.
+                Navigate extreme topography, retrieve geological core samples, and test planetary mobility.
+              </p>
               <div class="hub-home-summary">
                 <div class="hub-summary-row">
                   <span class="hub-muted-label" id="hub-home-callsign-label">Callsign</span>
@@ -372,20 +347,15 @@
                 </div>
                 <div class="hub-summary-row">
                   <span class="hub-muted-label" id="hub-home-rover-label">Assigned Rover</span>
-                  <span id="hub-home-rover" class="hub-summary-value">Explorer</span>
+                  <span id="hub-home-rover" class="hub-summary-value">Explorer &middot; All-Terrain</span>
                 </div>
                 <div class="hub-summary-row">
-                  <span class="hub-muted-label" id="hub-home-progress-label">Campaign Progress</span>
-                  <span id="hub-home-progress" class="hub-summary-value hub-mono-value">0 / 5 Missions · 0 / 15 Stars</span>
+                  <span class="hub-muted-label">Mission Sector</span>
+                  <span class="hub-summary-value hub-mono-value">Gale Crater &middot; Mount Sharp</span>
                 </div>
               </div>
-              <div class="hub-next-mission-box">
-                <span class="hub-next-label" id="hub-home-next-text">Next: Training 1</span>
-                <span class="hub-next-location" id="hub-home-next-location">Atacama Desert</span>
-              </div>
               <div class="hub-home-actions">
-                <button type="button" id="hub-launch-btn" class="hub-btn hub-btn-primary hub-btn-lg" disabled>Launch</button>
-                <button type="button" id="hub-home-missions-btn" class="hub-btn hub-btn-secondary">Select Mission</button>
+                <button type="button" id="hub-launch-btn" class="hub-btn hub-btn-primary hub-btn-lg hub-btn-start-game">START GAME</button>
               </div>
               <p id="hub-home-launch-hint" class="hub-muted-note" hidden></p>
             </div>
@@ -476,7 +446,7 @@
               <h2 class="hub-section-title" id="hub-challenges-heading">Mars Analog Challenges</h2>
               <p class="hub-section-subtitle" id="hub-challenges-subheading">Test your planetary science intuition: match Gale Crater landforms and climate conditions with Earth analogs using verified NASA and peer-reviewed research.</p>
             </div>
-            <div id="hub-challenges-counter" class="hub-mono-value hub-muted-text">0 / 3 Mastered</div>
+            <div id="hub-challenges-counter" class="hub-mono-value hub-muted-text">0 / 7 Mastered</div>
           </div>
 
           <div class="hub-challenges-container">
@@ -1017,6 +987,17 @@
           if (inGame) {
             Hub.showPause();
           }
+        });
+      }
+
+      // Top Navigation "GAME" button: switches to home page of the game
+      const gameTabBtn = document.getElementById('hub-tab-home');
+      if (gameTabBtn) {
+        gameTabBtn.addEventListener('click', () => {
+          if (inGame) {
+            stopSimulationGame();
+          }
+          Hub.show('home');
         });
       }
 

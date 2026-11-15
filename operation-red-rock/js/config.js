@@ -6,16 +6,16 @@ const LINKS = {
   challenges: 'game.html#challenges',
   game: 'game.html',                 // Operation Red Rock 3D Simulator & Mission Hub
   quiz: 'learning.html',             // Card 1: Challenge / Test your knowledge -> Learning Portal
-  rovers: 'game.html#garage',        // Card 2: Choose your rover -> Garage Screen in Game
+  rovers: 'game.html',               // Card 2: Choose your rover -> Game
   articles: 'learning.html'          // Card 3: Read scientific articles on Earth & Mars analogs
 };
 
 // Add one line here to add a new page to the header and footer:
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: LINKS.home },
-  { id: 'learning', label: 'Learning', href: LINKS.learning },
   { id: 'challenges', label: 'Challenges', href: LINKS.challenges },
-  { id: 'game', label: 'Game', href: LINKS.game, isAccent: true }
+  { id: 'articles', label: 'Articles', href: LINKS.articles },
+  { id: 'game', label: 'GAME', href: LINKS.game, isAccent: true }
 ];
 
 const TEXT = {
