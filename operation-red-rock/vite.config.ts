@@ -108,6 +108,7 @@ export default defineConfig(() => {
       alias: {
         '@': path.resolve(projectRoot, '.'),
       },
+      dedupe: ['react', 'react-dom', 'react-leaflet', 'leaflet'],
     },
     optimizeDeps: {
       include: ['three'],
@@ -127,6 +128,9 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      fs: {
+        allow: [projectRoot, workspaceRoot],
+      },
     },
   };
 });

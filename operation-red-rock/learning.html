@@ -163,6 +163,63 @@
         margin: 0 0 28px;
         font-size: 15px;
       }
+
+      /* View Switch */
+      .view-switch {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        width: fit-content;
+        margin-bottom: 32px;
+        padding: 6px;
+        background: #141A2E;
+        border: 1px solid #26304D;
+        border-radius: 10px;
+      }
+      .view-switch-btn {
+        appearance: none;
+        padding: 10px 18px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        color: #8A90A2;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      .view-switch-btn:hover {
+        color: #FFFFFF;
+        background: #1A223B;
+      }
+      .view-switch-btn.is-active {
+        color: #FFFFFF;
+        background: #E2572B;
+        border-color: #E2572B;
+      }
+      .interactive-map-panel {
+        overflow: hidden;
+        background: #07070C;
+        border: 1px solid #26304D;
+        border-radius: 10px;
+      }
+      .interactive-map-root {
+        min-height: 480px;
+        background: #07070C;
+      }
+      .interactive-map-hint {
+        margin: 0;
+        padding: 12px 16px;
+        border-top: 1px solid #1E2742;
+        color: #8A90A2;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+      }
+      [hidden] {
+        display: none !important;
+      }
       .grid-3 {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -364,6 +421,33 @@
 
     <!-- Main Content -->
     <main class="container section">
+      <!-- View Switch -->
+      <div class="view-switch" role="tablist" aria-label="Learning page view">
+        <button
+          type="button"
+          class="view-switch-btn is-active"
+          id="tab-original"
+          role="tab"
+          aria-selected="true"
+          aria-controls="original-content"
+          data-view="original"
+        >
+          Original Content
+        </button>
+        <button
+          type="button"
+          class="view-switch-btn"
+          id="tab-map"
+          role="tab"
+          aria-selected="false"
+          aria-controls="interactive-map-panel"
+          data-view="map"
+        >
+          Interactive Map
+        </button>
+      </div>
+
+      <div id="original-content" role="tabpanel" aria-labelledby="tab-original">
       <!-- Mars Gale Crater Baseline -->
       <div>
         <h2 class="section-heading">Target Location · Gale Crater (Mars)</h2>
@@ -495,6 +579,21 @@
           </a>
         </div>
       </section>
+      </div>
+
+      <!-- Interactive Mars Map -->
+      <div
+        id="interactive-map-panel"
+        class="interactive-map-panel"
+        role="tabpanel"
+        aria-labelledby="tab-map"
+        hidden
+      >
+        <div id="interactive-map-root" class="interactive-map-root"></div>
+        <p class="interactive-map-hint">
+          Explore real Martian geography on an interactive basemap and compare Mars locations with Earth analogues.
+        </p>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -531,6 +630,28 @@
           }
         });
       });
+
+      // Original content / interactive map view switch
+      const viewButtons = document.querySelectorAll('.view-switch-btn');
+      const originalContent = document.getElementById('original-content');
+      const interactivePanel = document.getElementById('interactive-map-panel');
+
+      function setLearningView(view) {
+        const showMap = view === 'map';
+        originalContent.hidden = showMap;
+        interactivePanel.hidden = !showMap;
+
+        viewButtons.forEach((btn) => {
+          const active = btn.dataset.view === view;
+          btn.classList.toggle('is-active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+      }
+
+      viewButtons.forEach((btn) => {
+        btn.addEventListener('click', () => setLearningView(btn.dataset.view));
+      });
     </script>
+    <script type="module" src="/src/learningMapMount.jsx"></script>
   </body>
 </html>
