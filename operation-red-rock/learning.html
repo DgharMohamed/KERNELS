@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning Portal — OPERATION RED ROCK</title>
+    <meta
+      name="description"
+      content="Comprehensive planetary science learning guide exploring Earth analog sites, Gale Crater on Mars, and rover preparation missions."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #0B1020;
+        color: #FFFFFF;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .container {
+        width: 100%;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      
+      /* Navigation Header */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(11, 16, 32, 0.92);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #26304D;
+      }
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Chakra Petch', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.05em;
+        color: #FFFFFF;
+      }
+      .brand-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #E2572B;
+        box-shadow: 0 0 10px rgba(226, 87, 43, 0.6);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+      }
+      .nav-btn-muted {
+        color: #8A90A2;
+        background: #141A2E;
+        border-color: #26304D;
+      }
+      .nav-btn-muted:hover {
+        color: #FFFFFF;
+        border-color: #3A466B;
+        background: #1A223B;
+      }
+      .nav-btn-accent {
+        color: #FFFFFF;
+        background: #E2572B;
+      }
+      .nav-btn-accent:hover {
+        background: #C9471F;
+        transform: translateY(-1px);
+      }
+
+      /* Hero Section */
+      .hero-section {
+        padding: 56px 0 40px;
+        text-align: center;
+        border-bottom: 1px solid #1E2742;
+        background: radial-gradient(circle at 50% 0%, rgba(226, 87, 43, 0.12) 0%, transparent 65%);
+      }
+      .hero-tag {
+        display: inline-block;
+        padding: 4px 12px;
+        background: rgba(226, 87, 43, 0.15);
+        border: 1px solid rgba(226, 87, 43, 0.4);
+        border-radius: 20px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: #E2572B;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 16px;
+      }
+      .hero-title {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 700;
+        margin: 0 0 16px;
+        line-height: 1.2;
+      }
+      .hero-desc {
+        max-width: 680px;
+        margin: 0 auto 28px;
+        font-size: 16px;
+        color: #8A90A2;
+      }
+      .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      /* Content Grid */
+      .section {
+        padding: 48px 0;
+      }
+      .section-heading {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 8px;
+      }
+      .section-sub {
+        color: #8A90A2;
+        margin: 0 0 28px;
+        font-size: 15px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: #141A2E;
+        border: 1px solid #26304D;
+        border-radius: 8px;
+        padding: 24px;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: #3A466B;
+      }
+      .card-tag {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: #5DCAA5;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+      }
+      .card-title {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 12px;
+      }
+      .card-text {
+        color: #C5CCE0;
+        font-size: 14px;
+        margin: 0 0 16px;
+      }
+      .card-meta {
+        border-top: 1px solid #1E2742;
+        padding-top: 12px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: #8A90A2;
+      }
+      
+      /* Target Mars Baseline Box */
+      .mars-baseline {
+        background: #10162B;
+        border: 1px solid #E2572B;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+      .baseline-metric-title {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: #8A90A2;
+        text-transform: uppercase;
+      }
+      .baseline-metric-val {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #E2572B;
+        margin: 4px 0;
+      }
+      .baseline-metric-desc {
+        font-size: 12px;
+        color: #C5CCE0;
+      }
+
+      /* Quiz Section */
+      .quiz-box {
+        background: #141A2E;
+        border: 1px solid #26304D;
+        border-radius: 8px;
+        padding: 28px;
+        margin-top: 24px;
+      }
+      .quiz-question {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 18px;
+        margin: 0 0 16px;
+      }
+      .quiz-options {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .quiz-opt {
+        padding: 12px 16px;
+        background: #0B1020;
+        border: 1px solid #26304D;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: left;
+        color: #FFFFFF;
+        transition: all 0.2s ease;
+      }
+      .quiz-opt:hover {
+        border-color: #E2572B;
+        background: #1A223B;
+      }
+      .quiz-opt.is-correct {
+        background: rgba(93, 202, 165, 0.15) !important;
+        border-color: #5DCAA5 !important;
+        color: #5DCAA5 !important;
+        font-weight: 600;
+      }
+      .quiz-opt.is-wrong {
+        background: rgba(226, 87, 43, 0.15) !important;
+        border-color: #E2572B !important;
+        color: #E2572B !important;
+      }
+      .quiz-feedback {
+        font-size: 14px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        background: #0B1020;
+        border: 1px solid #26304D;
+        display: none;
+      }
+
+      /* CTA Banner */
+      .cta-banner {
+        background: linear-gradient(135deg, #141A2E 0%, #1A223B 100%);
+        border: 1px solid #3A466B;
+        border-radius: 12px;
+        padding: 36px;
+        text-align: center;
+        margin: 48px 0;
+      }
+      .cta-title {
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        margin: 0 0 12px;
+      }
+      .cta-desc {
+        color: #8A90A2;
+        max-width: 600px;
+        margin: 0 auto 24px;
+        font-size: 15px;
+      }
+
+      /* Footer */
+      .site-footer {
+        border-top: 1px solid #1E2742;
+        padding: 32px 0;
+        text-align: center;
+        color: #8A90A2;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Header -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">
+          <span class="brand-dot"></span>
+          OPERATION RED ROCK
+        </a>
+        <nav>
+          <ul class="nav-links">
+            <li><a class="nav-btn nav-btn-muted" href="../main/mars-analogs (1)/index.html">← Main Site</a></li>
+            <li><a class="nav-btn nav-btn-muted" href="index.html">Home</a></li>
+            <li><a class="nav-btn nav-btn-muted" href="index.html#garage">Choose Rover</a></li>
+            <li><a class="nav-btn nav-btn-accent" href="index.html#challenges">Analog Challenges</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <span class="hero-tag">Planetary Science & Analog Learning</span>
+        <h1 class="hero-title">Prepare for Mars on Earth</h1>
+        <p class="hero-desc">
+          Planetary analogs are environments on Earth with physical, geological, or atmospheric conditions comparable to Mars.
+          Discover how NASA and space agencies use them to train rovers and design sample-retrieval missions.
+        </p>
+        <div class="hero-actions">
+          <a class="nav-btn nav-btn-accent" style="padding: 10px 20px; font-size: 14px;" href="index.html#challenges">
+            Start Interactive Challenge →
+          </a>
+          <a class="nav-btn nav-btn-muted" style="padding: 10px 20px; font-size: 14px;" href="index.html#garage">
+            Choose Your Rover
+          </a>
+          <a class="nav-btn nav-btn-muted" style="padding: 10px 20px; font-size: 14px;" href="index.html">
+            Open 3D Game
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container section">
+      <!-- Mars Gale Crater Baseline -->
+      <div>
+        <h2 class="section-heading">Target Location · Gale Crater (Mars)</h2>
+        <p class="section-sub">NASA MSL Curiosity Rover Target Baseline Telemetry</p>
+        <div class="mars-baseline">
+          <div>
+            <div class="baseline-metric-title">Crater Basin Scale</div>
+            <div class="baseline-metric-val">154 km</div>
+            <div class="baseline-metric-desc">Impact basin diameter preserving layered sediments</div>
+          </div>
+          <div>
+            <div class="baseline-metric-title">Mount Sharp (Aeolis Mons)</div>
+            <div class="baseline-metric-val">5.5 km</div>
+            <div class="baseline-metric-desc">Central mound height with 0.35–0.36 mound-to-moat ratio</div>
+          </div>
+          <div>
+            <div class="baseline-metric-title">Thermal Regime</div>
+            <div class="baseline-metric-val">-60°C</div>
+            <div class="baseline-metric-desc">Sub-zero polar hyper-arid regime with diurnal extremes</div>
+          </div>
+          <div>
+            <div class="baseline-metric-title">Atmospheric Moisture</div>
+            <div class="baseline-metric-val">0.0 mm / yr</div>
+            <div class="baseline-metric-desc">Completely desiccated atmosphere requiring dry analog testing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terrestrial Analogs Grid -->
+      <div>
+        <h2 class="section-heading">Earth Analog Sites & Rover Testing</h2>
+        <p class="section-sub">Why space missions decouple terrain morphology from climate testing</p>
+        <div class="grid-3">
+          <!-- Card 1: Atacama Desert -->
+          <article class="card">
+            <div class="card-tag">Chemical & Aridity Analog</div>
+            <h3 class="card-title">Atacama Desert, Chile</h3>
+            <p class="card-text">
+              The driest non-polar desert on Earth (&lt;2 mm annual rainfall). Its iron-rich, oxidized soil and intense solar UV flux
+              mirror Martian surface chemistry, making it ideal for testing life-detection instruments and rover chassis endurance.
+            </p>
+            <div class="card-meta">NASA AstroBio Testing · Hyper-arid</div>
+          </article>
+
+          <!-- Card 2: McMurdo Dry Valleys -->
+          <article class="card">
+            <div class="card-tag">Climate & Thermal Analog</div>
+            <h3 class="card-title">McMurdo Dry Valleys, Antarctica</h3>
+            <p class="card-text">
+              Earth's coldest and driest polar desert. With annual mean temperatures of -19.8°C and winter lows below -50°C, it reproduces
+              the frigid, sub-zero Martian climate for testing cryogenic rover lubricants, battery draw, and permafrost dynamics.
+            </p>
+            <div class="card-meta">Polar Desert · Frigid Diurnal Swing</div>
+          </article>
+
+          <!-- Card 3: Inselberg Pit -->
+          <article class="card">
+            <div class="card-tag">Morphological Analog</div>
+            <h3 class="card-title">Inselberg Pit</h3>
+            <p class="card-text">
+              Geomorphological formation replicating the central mound and perimeter moat geometry of Gale Crater.
+              It exhibits the 0.35–0.36 mound-to-moat ratio published in planetary science literature (Chan & Netoff 2017).
+            </p>
+            <div class="card-meta">Terrain Morphology · Ratio: 0.35</div>
+          </article>
+
+          <!-- Card 4: Dumont Dunes -->
+          <article class="card">
+            <div class="card-tag">Mobility & Wheel Slip</div>
+            <h3 class="card-title">Dumont Dunes & Mojave</h3>
+            <p class="card-text">
+              Loose windblown aeolian dunes used by JPL to simulate wheel sinkage and evaluate traction management before
+              navigating Curiosity through dangerous Martian sand ripples in Gale Crater.
+            </p>
+            <div class="card-meta">JPL Mobility Traction Field</div>
+          </article>
+
+          <!-- Card 5: Utah Navajo Sandstone -->
+          <article class="card">
+            <div class="card-tag">Sedimentology Analog</div>
+            <h3 class="card-title">Utah Navajo Sandstone</h3>
+            <p class="card-text">
+              Ancient Jurassic sand sea with hematite concretions ("Moqui marbles") identical in formation to the "blueberries"
+              discovered on Mars by the Opportunity rover.
+            </p>
+            <div class="card-meta">Hematite Concretions · Stratigraphy</div>
+          </article>
+
+          <!-- Card 6: Dual-Analog Strategy -->
+          <article class="card">
+            <div class="card-tag">NASA Exploration Methodology</div>
+            <h3 class="card-title">The Multi-Site Strategy</h3>
+            <p class="card-text">
+              No single location on Earth replicates both the low gravity, radiation, extreme cold, and morphology of Mars.
+              NASA engineers test chassis traction in desert dunes, and instruments in Antarctic dry valleys.
+            </p>
+            <div class="card-meta">Verified Space Agency Method</div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Quick Knowledge Check / Quiz -->
+      <section class="quiz-box" aria-labelledby="quiz-heading">
+        <span class="card-tag">Quick Knowledge Check</span>
+        <h3 id="quiz-heading" class="quiz-question">Test Your Knowledge: Which pair of Earth sites provides the most rigorous analog portfolio for Gale Crater?</h3>
+        <div class="quiz-options">
+          <button type="button" class="quiz-opt" data-correct="false">A) Atacama Desert + Mojave Desert (Hot arid only)</button>
+          <button type="button" class="quiz-opt" data-correct="true">B) Inselberg Pit (Terrain morphology) + McMurdo Dry Valleys (Frigid polar hyper-aridity)</button>
+          <button type="button" class="quiz-opt" data-correct="false">C) Dumont Dunes only (Traction only)</button>
+        </div>
+        <div id="quiz-feedback" class="quiz-feedback"></div>
+      </section>
+
+      <!-- CTA Banner -->
+      <section class="cta-banner">
+        <h2 class="cta-title">Ready to Test Your Skills in the 3D Simulator?</h2>
+        <p class="cta-desc">
+          Configure rover chassis, manage battery telemetry in the Atacama Desert, complete sample-retrieval challenges, and launch to Gale Crater.
+        </p>
+        <div class="hero-actions">
+          <a class="nav-btn nav-btn-accent" style="padding: 12px 24px; font-size: 15px;" href="index.html#challenges">
+            Take Analog Challenges in Hub →
+          </a>
+          <a class="nav-btn nav-btn-muted" style="padding: 12px 24px; font-size: 15px;" href="index.html#garage">
+            Choose Your Rover in Garage
+          </a>
+          <a class="nav-btn nav-btn-muted" style="padding: 12px 24px; font-size: 15px;" href="index.html">
+            Launch Mission Hub Game
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>OPERATION RED ROCK · Educational Planetary Science Project · Powered by verified NASA open datasets</p>
+        <p style="margin-top: 6px;">
+          <a href="../main/mars-analogs (1)/index.html" style="color: #E2572B; text-decoration: underline;">Return to Main Website</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Interactive Knowledge Check handler
+      document.querySelectorAll('.quiz-opt').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const isCorrect = btn.getAttribute('data-correct') === 'true';
+          const feedback = document.getElementById('quiz-feedback');
+          document.querySelectorAll('.quiz-opt').forEach(b => {
+            b.classList.remove('is-correct', 'is-wrong');
+          });
+          if (isCorrect) {
+            btn.classList.add('is-correct');
+            feedback.style.display = 'block';
+            feedback.style.borderColor = '#5DCAA5';
+            feedback.style.color = '#5DCAA5';
+            feedback.textContent = 'Correct! Modern Mars is a desiccated, sub-zero polar desert. Decoupled testing pairs Inselberg Pit for mound-in-basin morphology with McMurdo Dry Valleys for polar hyper-aridity.';
+          } else {
+            btn.classList.add('is-wrong');
+            feedback.style.display = 'block';
+            feedback.style.borderColor = '#E2572B';
+            feedback.style.color = '#E2572B';
+            feedback.textContent = 'Not quite! While hot deserts mimic aridity, modern Mars is frigid (-60°C). NASA planetary missions decouple landform morphology from polar cold-climate testing.';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

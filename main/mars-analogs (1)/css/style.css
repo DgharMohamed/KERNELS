@@ -1,0 +1,265 @@
+/* Mars Analogs — Main Stylesheet */
+:root {
+  --bg: #0B1020;
+  --surface: #141A2E;
+  --surface-hover: #1C2440;
+  --border: #232B45;
+  --text: #FFFFFF;
+  --text-muted: #8A90A2;
+  --accent: #E2572B;
+  --accent-hover: #EE6B42;
+  --on-accent: #0B1020;
+  --focus-ring: #FFFFFF;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --max-width: 1100px;
+  --header-height: 72px;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 80px;
+  --radius: 6px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font:1rem/1.5 var(--font-sans);-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
+
+/* ── Global starfield (covers entire page, not just the hero) ── */
+body::before,body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0}
+/* Layer A — bright white stars */
+body::before{
+  background-image:
+    radial-gradient(1.5px 1.5px at  4%  7%,#fff 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 14% 24%,#fff 0%,transparent 100%),
+    radial-gradient(1.8px 1.8px at 23%  5%,#fff 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 31% 15%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 39%  9%,#fff 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 48% 22%,#fff 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 55%  5%,#fff 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 62% 13%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 70%  8%,#fff 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 77% 17%,#fff 0%,transparent 100%),
+    radial-gradient(1.8px 1.8px at 83%  5%,#fff 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 91% 13%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at  2% 34%,#fff 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 18% 42%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 42% 39%,#fff 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 66% 32%,#fff 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 88% 36%,#fff 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 97% 43%,#fff 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at  9% 52%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 51% 55%,#fff 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 96% 54%,#fff 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 29% 68%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 73% 65%,#fff 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at  5% 78%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 44% 82%,#fff 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 85% 79%,#fff 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 20% 91%,#fff 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 60% 94%,#fff 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 92% 88%,#fff 0%,transparent 100%);
+  animation:twinkle-global-a 4.2s ease-in-out infinite;
+}
+/* Layer B — bluish-dim stars */
+body::after{
+  background-image:
+    radial-gradient(1.3px 1.3px at  7% 16%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 20% 28%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 35% 11%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 46% 25%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 19%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.7px 1.7px at 68%  3%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 79% 27%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 93% 15%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 15% 44%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 33% 48%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 60% 44%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 80% 42%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 26% 57%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 47% 62%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 72% 58%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at  3% 63%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 90% 61%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at 11% 74%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 37% 77%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 63% 72%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.6px 1.6px at 55% 86%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 78% 83%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.4px 1.4px at  8% 89%,#c5cce0 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 48% 97%,#8a90a2 0%,transparent 100%),
+    radial-gradient(1.3px 1.3px at 87% 93%,#c5cce0 0%,transparent 100%);
+  animation:twinkle-global-b 5.8s ease-in-out infinite;
+}
+@keyframes twinkle-global-a{0%,100%{opacity:.85}50%{opacity:.25}}
+@keyframes twinkle-global-b{0%,100%{opacity:.4}50%{opacity:.9}}
+
+/* Make all sections stack above the fixed starfield */
+body>*{position:relative;z-index:1}
+main{flex:1}
+h1,h2,h3,p,ul{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+.skip-link{position:absolute;top:-100px;left:var(--space-sm);z-index:100;padding:10px 16px;background:var(--accent);color:var(--on-accent);font-weight:700;text-decoration:none;border-radius:var(--radius)}
+.skip-link:focus{top:var(--space-sm)}
+.container{width:100%;max-width:var(--max-width);margin:0 auto;padding-inline:var(--space-md)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 22px;border-radius:var(--radius);font:700 1rem/1.25 inherit;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+.btn:active{transform:translateY(1px)}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-secondary{background:var(--bg);color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{background:var(--surface-hover);border-color:var(--text-muted)}
+
+/* Header & Navigation */
+.site-header{position:sticky;top:0;z-index:50;min-height:var(--header-height);background:var(--bg);border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;min-height:var(--header-height);gap:var(--space-sm)}
+.brand{display:inline-flex;align-items:center;gap:10px;min-height:44px;text-decoration:none;font-weight:700;font-size:1.125rem;letter-spacing:-.01em}
+.brand-logo{flex-shrink:0;transition:transform .4s ease}
+.brand:hover .brand-logo{transform:rotate(18deg)}
+.nav-list{display:flex;align-items:center;gap:var(--space-md)}
+.nav-link{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;text-decoration:none;color:var(--text-muted);font-weight:500;border-bottom:2px solid transparent;transition:color .18s ease,border-color .18s ease}
+.nav-link:hover{color:var(--text)}
+.nav-link.is-active,.nav-link[aria-current="page"]{color:var(--text);border-bottom-color:var(--accent)}
+.nav-btn{padding:10px 18px}
+.menu-toggle{display:none;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:8px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer}
+.menu-toggle:hover{background:var(--surface)}
+.menu-toggle .icon-close,.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.noscript-nav{display:flex;flex-wrap:wrap;gap:var(--space-sm);padding-block:12px}
+
+/* Hero (Centered Sky + Real Mars Horizon + Patrolling Rover) */
+.hero{position:relative;min-height:calc(100vh - var(--header-height));min-height:calc(100svh - var(--header-height));display:flex;align-items:center;justify-content:center;padding-block:var(--space-lg) clamp(190px,28vh,270px);overflow:hidden;background:var(--bg)}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.hero-mars-horizon{position:absolute;left:50%;top:calc(100% - clamp(220px,34vh,340px));width:clamp(620px,98vw,1380px);aspect-ratio:1;transform:translateX(-50%);pointer-events:none;z-index:1}
+.hero-mars-photo{display:block;width:100%;height:100%;object-fit:contain;border-radius:50%;mix-blend-mode:lighten}
+.hero-rover-overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hero-content{position:relative;z-index:2;max-width:720px;text-align:center}
+.hero-title{font-size:clamp(2.125rem,5vw,3.5rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:var(--space-sm)}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-muted);max-width:580px;margin:0 auto var(--space-md)}
+
+.hero-enter{animation:hero-rise .55s ease both}
+.hero-enter-2{animation-delay:.1s}
+.hero-enter-3{animation-delay:.2s}
+@keyframes hero-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.star-layer{transition:transform .25s ease-out}
+.star-layer-a{transform:translate(var(--px,0px),var(--py,0px))}
+.star-layer-b{transform:translate(calc(var(--px,0px) * -.6),calc(var(--py,0px) * -.6))}
+.star-a{animation:twinkle-a 4.2s ease-in-out infinite}
+.star-b{animation:twinkle-b 5.8s ease-in-out infinite}
+.star-c{animation:twinkle-c 6.6s ease-in-out infinite}
+@keyframes twinkle-a{0%,100%{opacity:.9}50%{opacity:.25}}
+@keyframes twinkle-b{0%,100%{opacity:.35}50%{opacity:.95}}
+@keyframes twinkle-c{0%,100%{opacity:.7}50%{opacity:.2}}
+.meteor{opacity:0;animation:meteor-pass 8s linear infinite}
+@keyframes meteor-pass{0%,72%{opacity:0;transform:translate(-180px,-90px)}78%{opacity:.95}88%,100%{opacity:0;transform:translate(320px,155px)}}
+.orbit-satellite{transform-origin:0 0;animation:spin-full 14s linear infinite}
+
+.hero-rover-track{animation:rover-patrol 16s ease-in-out infinite alternate}
+@keyframes rover-patrol{0%{transform:translateX(-65px)}100%{transform:translateX(35px)}}
+.hero-rover-body{animation:rover-bob 2.2s ease-in-out infinite}
+@keyframes rover-bob{0%,100%{transform:translate(525px,48px)}50%{transform:translate(525px,46px)}}
+.rover-wheel{transform-box:fill-box;transform-origin:center;animation:spin-full 2.8s linear infinite}
+.rover-head{transform-box:fill-box;transform-origin:bottom center;animation:head-scan 6s ease-in-out infinite}
+@keyframes head-scan{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
+.signal-ring{transform-box:fill-box;transform-origin:center;opacity:0;animation:signal-pulse 3.2s ease-out infinite}
+.signal-ring-2{animation-delay:1.6s}
+@keyframes signal-pulse{0%{opacity:.85;transform:scale(.5)}100%{opacity:0;transform:scale(3.2)}}
+@keyframes spin-full{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.scroll-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;transition:opacity .3s ease;pointer-events:none}
+.scroll-hint.is-hidden{opacity:0}
+.scroll-arrow{animation:scroll-bob 2s ease-in-out infinite}
+@keyframes scroll-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+/* Steps Section */
+.section{padding-block:var(--space-xl)}
+.section-heading{font-size:clamp(1.625rem,3vw,2.25rem);font-weight:700;line-height:1.2;margin-bottom:var(--space-lg)}
+.section-heading:focus{outline:none}
+.section-heading:focus-visible{outline:2px solid var(--focus-ring);outline-offset:4px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-md)}
+.step-card{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:var(--space-md);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .2s ease,transform .2s ease}
+.step-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.step-card:hover,.step-card:focus-within{border-color:var(--accent);transform:translateY(-3px)}
+.step-card:hover::before,.step-card:focus-within::before{transform:scaleX(1)}
+.step-card-quiz:hover .icon-check,.step-card-quiz:focus-within .icon-check{animation:check-pop .45s ease}
+@keyframes check-pop{0%{opacity:.3;transform:translate(-2px,2px)}100%{opacity:1;transform:translate(0,0)}}
+.step-card-rover:hover .icon-rover-body,.step-card-rover:focus-within .icon-rover-body{animation:rover-nudge .6s ease}
+@keyframes rover-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+.step-card-articles:hover .icon-line,.step-card-articles:focus-within .icon-line{animation:line-scan .55s ease}
+@keyframes line-scan{0%{transform:scaleX(.4)}100%{transform:scaleX(1)}}
+.icon-line{transform-box:fill-box;transform-origin:left}
+.step-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm)}
+.step-number{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--accent);font-weight:700;font-size:.9375rem}
+.step-title{font-size:1.25rem;font-weight:700;line-height:1.3;margin-bottom:var(--space-xs)}
+.step-desc{color:var(--text-muted);margin-bottom:var(--space-md);flex:1}
+.step-action{margin-top:auto}
+html.js-reveal .reveal-card{opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s ease,border-color .2s ease}
+html.js-reveal .reveal-card:nth-child(2){transition-delay:.08s}
+html.js-reveal .reveal-card:nth-child(3){transition-delay:.16s}
+html.js-reveal .reveal-card.is-visible{opacity:1;transform:translateY(0)}
+
+/* Game Band & Mission Trajectory */
+.game-section{padding-top:0;padding-bottom:var(--space-xl)}
+.game-band{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);padding:var(--space-lg) var(--space-md);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.game-band-info{display:flex;align-items:center;gap:var(--space-md)}
+.mission-route{flex-shrink:0}
+.mission-arc{animation:dash-flow 3s linear infinite}
+@keyframes dash-flow{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}
+.mission-probe{offset-path:path("M32 20 Q72 2 112 20");animation:probe-fly 3.4s ease-in-out infinite}
+@keyframes probe-fly{0%{offset-distance:0%;opacity:0}15%,85%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.game-band-text{font-size:clamp(1.125rem,2vw,1.375rem);font-weight:600;max-width:560px}
+.game-band .btn{flex-shrink:0}
+
+/* Placeholder Pages */
+.placeholder-section{padding-block:var(--space-xl)}
+.placeholder-card{max-width:620px;margin:0 auto;padding:var(--space-lg) var(--space-md);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.placeholder-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm)}
+.status-label{display:inline-block;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--accent);font-size:.875rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.orbit-spin{transform-origin:0 0;animation:spin-full 9s linear infinite}
+.radar-sweep{transform-origin:32px 32px;animation:spin-full 7s linear infinite}
+.placeholder-title{font-size:clamp(2rem,4vw,2.75rem);font-weight:800;line-height:1.15;margin-bottom:var(--space-sm)}
+.placeholder-message{color:var(--text-muted);font-size:1.125rem;margin-bottom:var(--space-md)}
+
+/* Footer & Toast */
+.site-footer{border-top:1px solid var(--border);background:var(--bg);padding-block:var(--space-lg)}
+.footer-inner{display:grid;gap:var(--space-md)}
+.footer-tagline{color:var(--text-muted);margin-top:var(--space-xs)}
+.footer-links{display:flex;flex-wrap:wrap;gap:var(--space-md)}
+.footer-notice{padding-top:var(--space-md);border-top:1px solid var(--border);color:var(--text-muted);font-size:.9375rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);z-index:100;padding:12px 20px;background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:var(--radius);font-weight:600;opacity:0;transition:opacity .2s ease,transform .2s ease}
+.toast.is-visible{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Responsive (< 760px) */
+@media (max-width:759px) {
+  .container{padding-inline:var(--space-sm)}
+  .menu-toggle{display:inline-flex}
+  .site-nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:var(--space-sm)}
+  .site-nav.is-open{display:block}
+  .nav-list{flex-direction:column;align-items:stretch;gap:var(--space-xs)}
+  .nav-link,.nav-btn{width:100%;justify-content:flex-start}
+  .nav-btn{justify-content:center;margin-top:var(--space-xs)}
+  .hero{padding-block:var(--space-lg) 185px}
+  .hero-mars-horizon{top:calc(100% - 195px);width:580px}
+  .section,.placeholder-section{padding-block:var(--space-lg)}
+  .game-section{padding-bottom:var(--space-lg)}
+  .steps-grid{grid-template-columns:1fr}
+  .game-band{flex-direction:column;align-items:flex-start;padding:var(--space-md)}
+  .game-band-info{flex-direction:column;align-items:flex-start;gap:var(--space-sm)}
+  .game-band .btn{width:100%}
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion:reduce) {
+  html{scroll-behavior:auto}
+  .hero-enter,.star-a,.star-b,.star-c,.meteor,.orbit-satellite,
+  .hero-rover-track,.hero-rover-body,.rover-wheel,.rover-head,
+  .signal-ring,.scroll-arrow,.mission-arc,.mission-probe,
+  .orbit-spin,.radar-sweep,.step-card *{animation:none!important}
+  body::before,body::after{animation:none!important}
+  .meteor{display:none}
+  .mission-probe{offset-path:none;cx:72px;cy:11px}
+  .btn,.nav-link,.brand-logo,.star-layer,.scroll-hint,.toast,
+  .step-card,.step-card::before,html.js-reveal .reveal-card{transition:none}
+  .step-card:hover,.step-card:focus-within{transform:none}
+  html.js-reveal .reveal-card{opacity:1;transform:none}
+}

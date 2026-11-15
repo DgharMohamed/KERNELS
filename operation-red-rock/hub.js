@@ -451,6 +451,16 @@ function getRecommendedMission() {
 // 7. NAVIGATION & ACCESSIBILITY
 // ============================================================================
 
+function getTargetScreenFromHash() {
+  const hash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+  if (hash === 'challenges' || hash === 'learning') return 'challenges';
+  if (hash === 'garage' || hash === 'rovers' || hash === 'rover') return 'garage';
+  if (hash === 'missions') return 'missions';
+  if (hash === 'codex') return 'codex';
+  if (hash === 'settings') return 'settings';
+  return 'home';
+}
+
 function showScreen(screenName) {
   const target = VALID_SCREENS.has(screenName) ? screenName : 'home';
   state.screen = target;
@@ -633,11 +643,11 @@ function setProgress(value) {
 
   updateHomeLaunchAvailability();
 
-  // When loading reaches 100 for the first time while on the loading screen, transition to Home
+  // When loading reaches 100 for the first time while on the loading screen, transition to target screen
   if (!wasComplete && clamped >= 100 && state.screen === 'loading') {
     window.setTimeout(() => {
       if (state.screen === 'loading' && state.progress >= 100) {
-        showScreen('home');
+        showScreen(getTargetScreenFromHash());
       }
     }, reducedMotionQuery.matches ? 0 : 220);
   }
@@ -2673,9 +2683,15 @@ function bindEvents() {
 
   setupTabKeyboardNavigation();
 
+  window.addEventListener('hashchange', () => {
+    if (state.screen !== 'loading') {
+      showScreen(getTargetScreenFromHash());
+    }
+  });
+
   if (dom.loadingEnterBtn) {
     dom.loadingEnterBtn.addEventListener('click', () => {
-      if (state.progress >= 100) showScreen('home');
+      if (state.progress >= 100) showScreen(getTargetScreenFromHash());
     });
   }
 
