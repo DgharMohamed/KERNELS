@@ -5,6 +5,7 @@ A 3D simulation game developed for the NASA Space Apps Challenge. The project mo
 ## Repository Structure
 
 - **operation-red-rock/**: Main web application, mission hub, and simulation canvas (Vite, React 19, TypeScript, Three.js 3D engine, Canvas).
+- **Ressources_Documentation.md**: Detailed scientific documentation of all NASA datasets, DEMs, satellite imagery, telemetry, and research literature.
 - **Car-Sounds/**: Vehicle audio and engine startup sound assets.
 - **Robot-Sounds/**: Rover mechanical movement and robotics sound assets.
 - **Wind-Sounds/**: Ambient Martian wind and atmospheric sound assets.
