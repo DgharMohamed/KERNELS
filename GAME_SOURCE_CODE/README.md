@@ -116,6 +116,12 @@ If you make changes in Godot and want to update the `web_build` folder:
 
 ---
 
+## Super Intelligence-Assisted Development
+
+Super intelligence coding agents were used to support development of this project, including **Antigravity** and **GitHub Copilot**. They assisted with coding and development tasks; project decisions and final changes were reviewed by the developer.
+
+---
+
 ## Resources Used
 
 Checked against the project files and data citations:
