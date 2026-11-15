@@ -205,6 +205,13 @@
   height: 100%;
 }
 
+.hub-tablist {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
 .hub-tab {
   appearance: none;
   background: rgba(18, 25, 45, 0.65);
@@ -2794,15 +2801,21 @@
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-start;
     gap: 4px;
     padding: 0 4px;
+    overflow-x: auto;
+  }
+
+  .hub-tablist {
+    display: contents;
   }
 
   .hub-tab {
     padding: 6px 10px;
     font-size: 12px;
     min-height: 38px;
+    flex-shrink: 0;
   }
 
   .hub-nav-game-btn {

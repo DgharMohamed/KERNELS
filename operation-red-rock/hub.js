@@ -2528,7 +2528,7 @@ function cacheDom() {
   dom.starfield = document.getElementById('hub-starfield');
   dom.navBar = document.getElementById('hub-nav-bar');
   dom.navCallsignValue = document.getElementById('hub-nav-callsign-value');
-  dom.tabs = Array.from(document.querySelectorAll('.hub-tab'));
+  dom.tabs = Array.from(document.querySelectorAll('.hub-tab[role="tab"]'));
   dom.screens = Array.from(document.querySelectorAll('.hub-screen'));
 
   // Loading

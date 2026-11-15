@@ -4,15 +4,16 @@ const LINKS = {
   home: 'index.html',
   learning: 'learning.html',
   challenges: 'game.html#challenges',
+  articles: 'game.html#articles',
   game: 'game.html',                 // Operation Red Rock 3D Simulator & Mission Hub
   quiz: 'learning.html',             // Card 1: Challenge / Test your knowledge -> Learning Portal
-  rovers: 'game.html',               // Card 2: Choose your rover -> Game
-  articles: 'learning.html'          // Card 3: Read scientific articles on Earth & Mars analogs
+  rovers: 'game.html'                // Card 2: Choose your rover -> Game
 };
 
 // Add one line here to add a new page to the header and footer:
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: LINKS.home },
+  { id: 'learning', label: 'Learning & Map', href: LINKS.learning },
   { id: 'challenges', label: 'Challenges', href: LINKS.challenges },
   { id: 'articles', label: 'Articles', href: LINKS.articles },
   { id: 'game', label: 'GAME', href: LINKS.game, isAccent: true }
@@ -49,7 +50,7 @@ const TEXT = {
       title: 'Read articles',
       description: 'Short, easy articles about places on Mars and the Earth sites that look like them.',
       buttonText: 'Read articles',
-      href: LINKS.articles
+      href: LINKS.learning
     }
   ],
   gameBand: {
