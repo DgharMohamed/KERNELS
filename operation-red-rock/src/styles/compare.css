@@ -1,0 +1,429 @@
+.content-page--wide {
+  width: min(1440px, 100%);
+}
+
+.compare-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.compare-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.compare-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.compare-switcher__item {
+  padding: 8px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text-soft);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.compare-switcher__item:hover {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.compare-switcher__item.is-active {
+  border-color: rgba(255, 138, 76, 0.5);
+  background: linear-gradient(135deg, rgba(255, 90, 40, 0.22), rgba(255, 90, 40, 0.06));
+  color: #ffd7c2;
+}
+
+.compare-maps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.compare-map {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.compare-map__canvas {
+  position: relative;
+  height: clamp(280px, 36vh, 420px);
+  background: #08080e;
+}
+
+.planet-map {
+  width: 100%;
+  height: 100%;
+  background: #08080e;
+}
+
+.compare-map--earth .leaflet-tile-pane {
+  filter: saturate(0.92) contrast(1.05) brightness(0.94);
+}
+
+.compare-map__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(9, 9, 15, 0.78);
+  backdrop-filter: blur(10px);
+  color: var(--text-soft);
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.compare-map__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mars-bright);
+  box-shadow: 0 0 10px rgba(255, 138, 76, 0.9);
+}
+
+.compare-map--earth .compare-map__dot {
+  background: #58a6ff;
+  box-shadow: 0 0 10px rgba(88, 166, 255, 0.9);
+}
+
+.compare-map__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.compare-map__caption-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.compare-map__caption strong {
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.compare-map__caption-meta {
+  color: var(--text-soft);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.66rem;
+}
+
+.compare-panel {
+  margin-top: 18px;
+  padding: 20px 22px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.compare-panel h2,
+.compare-card h2 {
+  font-size: 1.02rem;
+}
+
+.compare-table-scroll {
+  overflow-x: auto;
+}
+
+.compare-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compare-table thead th {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.compare-table tbody th {
+  width: 18%;
+  color: var(--text);
+  font-weight: 650;
+}
+
+.compare-table tbody td {
+  width: 41%;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.compare-table tbody tr:last-child th,
+.compare-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.compare-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.compare-notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.compare-card {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.compare-card--shared {
+  border-color: rgba(255, 138, 76, 0.28);
+  background:
+    radial-gradient(340px 160px at 100% 0%, rgba(255, 90, 40, 0.12), transparent 70%),
+    var(--panel);
+}
+
+.compare-card--different {
+  border-color: rgba(88, 166, 255, 0.24);
+  background:
+    radial-gradient(340px 160px at 100% 0%, rgba(88, 166, 255, 0.1), transparent 70%),
+    var(--panel);
+}
+
+.compare-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compare-list li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.compare-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.52em;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(140deg, var(--mars-bright), var(--mars-deep));
+  transform: rotate(45deg);
+}
+
+.compare-card--different .compare-list li::before {
+  background: linear-gradient(140deg, #7fc0ff, #2c6db3);
+}
+
+.compare-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.compare-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
+  box-shadow: var(--shadow-panel);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.compare-choice:hover {
+  border-color: rgba(255, 138, 76, 0.5);
+  background:
+    radial-gradient(320px 150px at 100% 0%, rgba(255, 90, 40, 0.14), transparent 70%),
+    var(--panel-raise);
+  transform: translateY(-2px);
+}
+
+.compare-choice__pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.compare-choice__arrow {
+  color: var(--mars-bright);
+}
+
+.compare-choice__meta {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.compare-choice__summary {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.compare-choice__cta {
+  margin-top: 4px;
+  color: var(--mars-bright);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.planet-marker {
+  border: 0;
+  background: transparent;
+}
+
+.planet-marker__halo,
+.planet-marker__dot {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.planet-marker__halo {
+  inset: 0;
+  animation: planet-pulse 2.6s ease-out infinite;
+}
+
+.planet-marker__dot {
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  transform: translate(-50%, -50%);
+}
+
+.planet-marker--mars .planet-marker__halo {
+  background: rgba(255, 90, 40, 0.28);
+}
+
+.planet-marker--mars .planet-marker__dot {
+  border-color: #ffd9c2;
+  background: var(--mars);
+  box-shadow:
+    0 0 0 3px rgba(255, 90, 40, 0.25),
+    0 0 18px rgba(255, 90, 40, 0.85);
+}
+
+.planet-marker--earth .planet-marker__halo {
+  background: rgba(88, 166, 255, 0.26);
+}
+
+.planet-marker--earth .planet-marker__dot {
+  border-color: #d6ebff;
+  background: #58a6ff;
+  box-shadow:
+    0 0 0 3px rgba(88, 166, 255, 0.25),
+    0 0 18px rgba(88, 166, 255, 0.85);
+}
+
+@keyframes planet-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+.planet-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.planet-popup__eyebrow {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mars-bright);
+}
+
+.planet-popup strong {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.planet-popup__meta {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.64rem;
+}
+
+@media (max-width: 860px) {
+  .compare-maps,
+  .compare-notes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compare-panel {
+    padding: 16px 14px 4px;
+  }
+}
