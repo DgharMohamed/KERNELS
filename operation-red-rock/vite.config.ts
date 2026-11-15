@@ -45,11 +45,15 @@ export default defineConfig(() => {
       },
     },
     optimizeDeps: {
-      exclude: ['three'],
+      include: ['three'],
     },
     build: {
       rollupOptions: {
-        external: ['three', /^three\//],
+        input: {
+          main: path.resolve(projectRoot, 'index.html'),
+          game: path.resolve(projectRoot, 'game.html'),
+          learning: path.resolve(projectRoot, 'learning.html'),
+        },
       },
     },
     server: {

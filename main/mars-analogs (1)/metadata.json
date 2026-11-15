@@ -1,6 +1,0 @@
-{
-  "name": "Mars Analogs",
-  "description": "Educational space project exploring planetary analogs: places on Earth that look like Mars, and how scientists and rovers prepare for Mars missions.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

@@ -2,12 +2,12 @@
 
 const LINKS = {
   home: 'index.html',
-  learning: '../../operation-red-rock/learning.html',
-  challenges: '../../operation-red-rock/index.html#challenges',
-  game: '../../operation-red-rock/index.html',                 // Operation Red Rock Game / Home
-  quiz: '../../operation-red-rock/learning.html',             // Card 1: Challenge / Test your knowledge -> Operation Red Rock Learning
-  rovers: '../../operation-red-rock/index.html',              // Card 2: Choose your rover -> Operation Red Rock Home
-  articles: '#'                                               // Card 3: Read articles
+  learning: 'learning.html',
+  challenges: 'game.html#challenges',
+  game: 'game.html',                 // Operation Red Rock 3D Simulator & Mission Hub
+  quiz: 'learning.html',             // Card 1: Challenge / Test your knowledge -> Learning Portal
+  rovers: 'game.html#garage',        // Card 2: Choose your rover -> Garage Screen in Game
+  articles: 'learning.html'          // Card 3: Read scientific articles on Earth & Mars analogs
 };
 
 // Add one line here to add a new page to the header and footer:
@@ -28,7 +28,7 @@ const TEXT = {
   stepsHeading: 'How it works',
   steps: [
     {
-      number: '1',
+      number: 'PHASE // 01',
       icon: 'quiz',
       title: 'Challenge your knowledge',
       description: 'Take short quizzes and learn how to choose the right rover for every mission.',
@@ -36,7 +36,7 @@ const TEXT = {
       href: LINKS.quiz
     },
     {
-      number: '2',
+      number: 'PHASE // 02',
       icon: 'rover',
       title: 'Choose the right rover for the right mission',
       description: 'Compare rovers and match each one to the mission it can handle.',
@@ -44,7 +44,7 @@ const TEXT = {
       href: LINKS.rovers
     },
     {
-      number: '3',
+      number: 'PHASE // 03',
       icon: 'articles',
       title: 'Read articles',
       description: 'Short, easy articles about places on Mars and the Earth sites that look like them.',

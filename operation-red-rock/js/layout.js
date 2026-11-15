@@ -49,7 +49,7 @@
       card.querySelector('.step-title').textContent = s.title;
       card.querySelector('.step-desc').textContent = s.description;
       var b = card.querySelector('.step-action .btn');
-      b.textContent = s.buttonText;
+      b.innerHTML = '<span>' + esc(s.buttonText) + '</span><span class="btn-arrow" aria-hidden="true">&rarr;</span>';
       b.setAttribute('href', s.href);
       b.toggleAttribute('data-coming-soon', s.href === '#');
     });

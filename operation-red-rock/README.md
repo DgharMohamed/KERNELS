@@ -42,10 +42,12 @@ Focused time-boxed hackathon scope featuring 1 to 3 complete missions:
 operation-red-rock/
 ├── public/assets/              # Topography maps, video briefings, and textures
 ├── src/                        # Application source
+├── index.html                  # Main home page (educational portal & planet horizon)
+├── game.html                   # 3D rover simulator & Mission Hub viewport
+├── learning.html               # Planetary science learning portal
 ├── hub.js                      # Mission hub controller and telemetry bridge
 ├── hubData.js                  # Datasets, mission configurations, and rover attributes
 ├── hub.css                     # Mission control UI styles
-├── index.html                  # Main shell and game canvas viewport
 ├── INTEGRATION.md              # Game engine integration interface
 ├── Ressources_Documentation.md # Comprehensive documentation of NASA datasets & maps
 └── package.json                # Dependencies and build scripts
