@@ -214,6 +214,16 @@ const engine = new Engine(GODOT_CONFIG);
 		}, displayFailureNotice);
 	}
 }());
+
+window.addEventListener('keydown', function (e) {
+	if (e.key === 'Escape') {
+		try {
+			if (window.parent && window.parent !== window) {
+				window.parent.postMessage({ type: 'HUB_PAUSE_TRIGGER' }, '*');
+			}
+		} catch (_) {}
+	}
+});
 		</script>
 	</body>
 </html>

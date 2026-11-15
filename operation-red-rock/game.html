@@ -251,7 +251,23 @@
     </style>
   </head>
   <body>
-    <!-- Teammate game canvas sits behind the Mission Hub overlay -->
+    <!-- Simulation Game Viewport (Godot Web Build) -->
+    <iframe
+      id="game-frame"
+      class="game-frame"
+      title="Operation Red Rock Simulation"
+      tabindex="0"
+      allow="autoplay; fullscreen; focus-without-user-activation; cross-origin-isolated"
+      hidden
+    ></iframe>
+    <button type="button" id="game-pause-trigger-btn" class="game-pause-trigger-btn" aria-label="Pause simulation" title="Pause simulation (Esc)" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+        <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+      </svg>
+      <span>PAUSE</span>
+    </button>
+    <!-- Background game canvas / fallback -->
     <canvas id="game-canvas" aria-label="Game viewport"></canvas>
 
     <!-- === MISSION HUB HTML FRAGMENT START === -->
@@ -867,73 +883,151 @@
           </svg>
         </button>
       </div>
+
+      <!-- End of video action card / prompt -->
+      <div id="hub-intro-endcard" class="hub-intro-endcard" hidden>
+        <div class="hub-intro-endcard-content">
+          <div class="hub-intro-badge">
+            <span class="hub-intro-badge-dot"></span>
+            MISSION BRIEFING COMPLETE
+          </div>
+          <h2 class="hub-intro-endcard-title">OPERATION RED ROCK</h2>
+          <p class="hub-intro-endcard-sub">Analog telemetry calibrated. Rover systems online. Ready to deploy simulation.</p>
+          <div class="hub-intro-endcard-actions">
+            <button type="button" id="hub-intro-start-btn" class="hub-btn hub-btn-primary hub-btn-lg hub-intro-start-btn">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>START SIMULATION GAME</span>
+            </button>
+            <button type="button" id="hub-intro-replay-btn" class="hub-btn hub-btn-secondary hub-intro-replay-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+              <span>Replay Intro</span>
+            </button>
+          </div>
+          <p class="hub-intro-hint">Click the button or press any key to enter simulation</p>
+        </div>
+      </div>
     </div>
     <!-- === MISSION HUB HTML FRAGMENT END === -->
 
     <script type="module" src="./hub.js"></script>
 
-    <!-- Standalone Preview & ?demo Test Mode Harness (teammates: replace this script with your game.js) -->
+    <!-- Simulation Harness: Godot Web Build Integration -->
     <script type="module">
       import Hub from './hub.js';
 
       const params = new URLSearchParams(window.location.search);
       const isDemo = params.has('demo');
       const canvas = document.getElementById('game-canvas');
+      const gameFrame = document.getElementById('game-frame');
+      const pauseTriggerBtn = document.getElementById('game-pause-trigger-btn');
       let inGame = false;
       let activeMission = null;
 
-      function drawSimulatedGameCanvas(text) {
-        if (!canvas) return;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.fillStyle = '#0B1020';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#1E1B16';
-        ctx.fillRect(0, canvas.height * 0.58, canvas.width, canvas.height * 0.42);
-        if (text) {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = '600 18px "Chakra Petch", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(text, canvas.width / 2, canvas.height * 0.46);
-          ctx.fillStyle = '#8A90A2';
-          ctx.font = '14px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText('Simulated game viewport — Press Esc to open Pause menu', canvas.width / 2, canvas.height * 0.46 + 28);
+      function startSimulationGame(missionId, robotId) {
+        inGame = true;
+        activeMission = { missionId, robotId };
+        if (canvas) canvas.hidden = true;
+        if (gameFrame) {
+          gameFrame.hidden = false;
+          // Build URL to web_build simulation game with parameters
+          const gameUrl = `/web_build/index.html?mission=${encodeURIComponent(missionId || 'training1')}&robot=${encodeURIComponent(robotId || 'explorer')}`;
+          if (gameFrame.src !== window.location.origin + gameUrl) {
+            gameFrame.src = gameUrl;
+          }
+          // Give focus to the simulation frame so keys (WASD, arrows) work immediately
+          setTimeout(() => {
+            try {
+              gameFrame.focus();
+              gameFrame.contentWindow?.focus();
+            } catch (_) {}
+          }, 100);
+        }
+        if (pauseTriggerBtn) {
+          pauseTriggerBtn.hidden = false;
+        }
+      }
+
+      function stopSimulationGame() {
+        inGame = false;
+        activeMission = null;
+        if (gameFrame) {
+          gameFrame.src = 'about:blank';
+          gameFrame.hidden = true;
+        }
+        if (pauseTriggerBtn) {
+          pauseTriggerBtn.hidden = true;
+        }
+        if (canvas) {
+          canvas.hidden = false;
         }
       }
 
       Hub.init({
         onLaunch({ missionId, robotId }) {
-          if (isDemo) console.log('[Hub Demo] onLaunch:', { missionId, robotId });
-          inGame = true;
-          activeMission = { missionId, robotId };
-          drawSimulatedGameCanvas(`Running ${missionId} with ${robotId}`);
+          if (isDemo) console.log('[Hub] onLaunch:', { missionId, robotId });
+          startSimulationGame(missionId, robotId);
         },
         onReplayIntro() {
-          if (isDemo) console.log('[Hub Demo] onReplayIntro');
+          if (isDemo) console.log('[Hub] onReplayIntro');
         },
         onSettingsChange(settings) {
-          if (isDemo) console.log('[Hub Demo] onSettingsChange:', settings);
+          if (isDemo) console.log('[Hub] onSettingsChange:', settings);
         },
         onAudioUnlock() {
-          if (isDemo) console.log('[Hub Demo] onAudioUnlock');
+          if (isDemo) console.log('[Hub] onAudioUnlock');
         },
         onRestart() {
-          if (isDemo) console.log('[Hub Demo] onRestart');
-          if (activeMission) {
-            drawSimulatedGameCanvas(`Restarted ${activeMission.missionId} with ${activeMission.robotId}`);
+          if (isDemo) console.log('[Hub] onRestart');
+          if (gameFrame && activeMission) {
+            const gameUrl = `/web_build/index.html?mission=${encodeURIComponent(activeMission.missionId)}&robot=${encodeURIComponent(activeMission.robotId)}&t=${Date.now()}`;
+            gameFrame.src = gameUrl;
+            setTimeout(() => {
+              try {
+                gameFrame.focus();
+                gameFrame.contentWindow?.focus();
+              } catch (_) {}
+            }, 100);
           }
         },
         onResume() {
-          if (isDemo) console.log('[Hub Demo] onResume');
+          if (isDemo) console.log('[Hub] onResume');
+          if (gameFrame) {
+            setTimeout(() => {
+              try {
+                gameFrame.focus();
+                gameFrame.contentWindow?.focus();
+              } catch (_) {}
+            }, 50);
+          }
         },
         onBackToHub() {
-          if (isDemo) console.log('[Hub Demo] onBackToHub');
-          inGame = false;
-          activeMission = null;
-          drawSimulatedGameCanvas('');
+          if (isDemo) console.log('[Hub] onBackToHub');
+          stopSimulationGame();
         },
+      });
+
+      // Pause menu trigger button in HUD
+      if (pauseTriggerBtn) {
+        pauseTriggerBtn.addEventListener('click', () => {
+          if (inGame) {
+            Hub.showPause();
+          }
+        });
+      }
+
+      // Listen for message from inside iframe (e.g. Escape key pressed in Godot)
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'HUB_PAUSE_TRIGGER' && inGame) {
+          const pauseOverlay = document.getElementById('hub-pause-overlay');
+          if (pauseOverlay && pauseOverlay.hidden) {
+            Hub.showPause();
+          }
+        }
       });
 
       window.addEventListener('keydown', (e) => {
